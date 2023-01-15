@@ -1,0 +1,10 @@
+.coverage
+__version__.py
+*Versionfile
+*__pycache__
+*.tar.gz
+*.pyc
+*.egg-info
+*pip-wheel-metadata/
+.pytest_cache
+.mypy_cache
