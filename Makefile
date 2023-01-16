@@ -6,7 +6,7 @@ PKG_VERSION_FILE=__version__.py
 VERSION_FILE=Versionfile
 
 $(VERSION_FILE):
-	echo "$(VERSION)" > $@
+	@echo "$(VERSION)" > $@
 
 $(PKG_VERSION_FILE):
 	@echo "__version__ = '$(VERSION)'" > $@
@@ -15,6 +15,8 @@ versionfiles: $(VERSION_FILE) $(PKG_VERSION_FILE)
 
 devinstall: versionfiles
 	$(PIP) install -e .[test]
+
+test: tests
 
 tests:
 	pytest -vv tests/
