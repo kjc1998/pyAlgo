@@ -13,8 +13,9 @@ class TestAndroidBoard:
 
     @pytest.fixture
     def board_model(self, linked_nodes):
-        node_five = board.Node("5")
-        return android_board.AndroidBoard([*linked_nodes, node_five])
+        other_nodes = [board.Node(str(i)) for i in range(5, 10)]
+        positions = android_board.NodePositions(*linked_nodes, *other_nodes)
+        return android_board.AndroidBoard(positions)
 
     def test_get_sequence(self, linked_nodes, board_model):
         expected = linked_nodes
