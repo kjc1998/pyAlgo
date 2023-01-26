@@ -1,26 +1,45 @@
 import dataclasses
 import textwrap
 from boards import board
-from typing import Any, List
+from typing import Any, Iterable, List
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(frozen=True)
 class NodePositions:
-    top_left: board.Node = board.Node("1")
-    top_centre: board.Node = board.Node("2")
-    top_right: board.Node = board.Node("3")
-    mid_left: board.Node = board.Node("4")
-    mid_centre: board.Node = board.Node("5")
-    mid_right: board.Node = board.Node("6")
-    bottom_left: board.Node = board.Node("7")
-    bottom_centre: board.Node = board.Node("8")
-    bottom_right: board.Node = board.Node("9")
+    # fmt: off
+    top_left: board.Node = dataclasses.field(default_factory=lambda: board.Node("1"))
+    top_centre: board.Node = dataclasses.field(default_factory=lambda: board.Node("2"))
+    top_right: board.Node = dataclasses.field(default_factory=lambda: board.Node("3"))
+    mid_left: board.Node = dataclasses.field(default_factory=lambda: board.Node("4"))
+    mid_centre: board.Node = dataclasses.field(default_factory=lambda: board.Node("5"))
+    mid_right: board.Node = dataclasses.field(default_factory=lambda: board.Node("6"))
+    bottom_left: board.Node = dataclasses.field(default_factory=lambda: board.Node("7"))
+    bottom_centre: board.Node = dataclasses.field(default_factory=lambda: board.Node("8"))
+    bottom_right: board.Node = dataclasses.field(default_factory=lambda: board.Node("9"))
+    # fmt: on
+
+    def __iter__(self) -> Iterable[board.Node]:
+        field_names = [field.name for field in dataclasses.fields(self)]
+        for field_name in field_names:
+            yield getattr(self, field_name)
+
+    @property
+    def active_node(self) -> board.Node:
+        for node in self:
+            if node.activate:
+                return node
+
+    def activate(self, active_node: board.Node) -> None:
+        for node in self:
+            if node.id == active_node.id:
+                node.active = True
+                node.visited = True
+            else:
+                node.activate = False
 
     def __post_init__(self):
-        field_names = [field.name for field in dataclasses.fields(self)]
         checked_list = []
-        for field_name in field_names:
-            node = getattr(self, field_name)
+        for node in self:
             if node.id in checked_list:
                 raise ValueError(f"id: {node.id} has already been used")
             checked_list.append(node.id)

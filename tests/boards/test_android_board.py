@@ -1,13 +1,29 @@
 import pytest
+import dataclasses
 from boards import board as board_, android_board
 
 
-def test_same_id_error():
-    with pytest.raises(ValueError):
-        android_board.NodePositions(
-            board_.Node("2"),
-            board_.Node("2"),
-        )
+class TestNodePositions:
+    def test_read_only_access(self):
+        positions = android_board.NodePositions()
+        with pytest.raises(dataclasses.FrozenInstanceError):
+            positions.top_centre = 1
+
+    def test_activate(self):
+        positions = android_board.NodePositions()
+        node_one = positions.top_centre
+        node_two = positions.bottom_right
+        positions.activate(node_one)
+        assert positions.top_centre.active
+        positions.activate(node_two)
+        assert positions.bottom_right.active
+
+    def test_same_id_error(self):
+        with pytest.raises(ValueError):
+            android_board.NodePositions(
+                board_.Node("2"),
+                board_.Node("2"),
+            )
 
 
 class TestAndroidBoard:
