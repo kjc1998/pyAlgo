@@ -1,11 +1,10 @@
 import dataclasses
-import textwrap
 from boards import board
 from typing import Any, Iterable, List
 
 
 @dataclasses.dataclass(frozen=True)
-class NodePositions:
+class NodePositionController:
     # fmt: off
     top_left: board.Node = dataclasses.field(default_factory=lambda: board.Node("1"))
     top_centre: board.Node = dataclasses.field(default_factory=lambda: board.Node("2"))
@@ -23,11 +22,14 @@ class NodePositions:
         for field_name in field_names:
             yield getattr(self, field_name)
 
-    @property
-    def active_node(self) -> board.Node:
-        for node in self:
-            if node.activate:
-                return node
+    def __str__(self) -> str:
+        nodes = [node for node in self]
+        content = ""
+        for i in range(3):
+            start = i * 3
+            line = "\t".join([self._repr(nodes[j]) for j in range(start, start + 3)])
+            content += f"{line}\n"
+        return content
 
     def activate(self, active_node: board.Node) -> None:
         for node in self:
@@ -44,40 +46,34 @@ class NodePositions:
                 raise ValueError(f"id: {node.id} has already been used")
             checked_list.append(node.id)
 
+    def _repr(self, node: board.Node) -> str:
+        if node.active:
+            return "X"
+        elif node.visited:
+            return "1"
+        return "0"
+
 
 class AndroidBoard(board.Board):
-    def __init__(self, positions: "NodePositions"):
-        self._positions = positions
-        nodes = [getattr(positions, f.name) for f in dataclasses.fields(positions)]
-        self._active_node = self._get_active(nodes)
+    def __init__(self, controller: "NodePositionController"):
+        self._controller = controller
+
+    def __str__(self) -> str:
+        return f"{type(self).__name__}(\n{str(self._controller)})"
 
     def __repr__(self) -> str:
-        def repr(node: board.Node) -> str:
-            if node.active:
-                return "X"
-            if node.visited:
-                return "1"
-            return "0"
-
-        pos = self._positions
-        content = f"""\
-        {type(self).__name__}(
-        {repr(pos.top_left)}\t{repr(pos.top_centre)}\t{repr(pos.top_right)}
-        {repr(pos.mid_left)}\t{repr(pos.mid_centre)}\t{repr(pos.mid_right)}
-        {repr(pos.bottom_left)}\t{repr(pos.bottom_centre)}\t{repr(pos.bottom_right)}
-        )"""
-        return textwrap.dedent(content)
+        return str(self)
 
     def __eq__(self, other: Any) -> bool:
-        return (
-            type(self) == type(other)
-            and self._positions == other._positions
-            and self._active_node == other._active_node
-        )
+        return type(self) == type(other) and self._controller == other._controller
 
     def get_sequence(self) -> List[board.Node]:
-        result = [self._active_node]
-        current = self._active_node
+        result = []
+        for node in self._controller:
+            if node.active:
+                result.append(node)
+                break
+        current = result[0]
         while current.parent:
             current = current.parent
             result.insert(0, current)
@@ -85,8 +81,3 @@ class AndroidBoard(board.Board):
 
     def get_next_boards(self) -> List[board.Board]:
         raise NotImplementedError
-
-    def _get_active(self, nodes: List[board.Node]) -> board.Node:
-        for node in nodes:
-            if node.active:
-                return node

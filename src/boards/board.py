@@ -17,6 +17,11 @@ class Board(abc.ABC):
     """
 
     @abc.abstractmethod
+    def __str__(self) -> str:
+        """String representation of self"""
+        raise NotImplementedError
+
+    @abc.abstractmethod
     def __repr__(self) -> str:
         """Print representation of self"""
         raise NotImplementedError

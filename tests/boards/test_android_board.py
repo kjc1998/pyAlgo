@@ -3,14 +3,14 @@ import dataclasses
 from boards import board as board_, android_board
 
 
-class TestNodePositions:
+class TestNodePositionController:
     def test_read_only_access(self):
-        positions = android_board.NodePositions()
+        positions = android_board.NodePositionController()
         with pytest.raises(dataclasses.FrozenInstanceError):
             positions.top_centre = 1
 
     def test_activate(self):
-        positions = android_board.NodePositions()
+        positions = android_board.NodePositionController()
         node_one = positions.top_centre
         node_two = positions.bottom_right
         positions.activate(node_one)
@@ -18,9 +18,15 @@ class TestNodePositions:
         positions.activate(node_two)
         assert positions.bottom_right.active
 
+    def test_string(self):
+        positions = android_board.NodePositionController()
+        expected = "0\t0\t0\n0\t0\t0\n0\t0\t0\n"
+        observed = str(positions)
+        assert expected == observed
+
     def test_same_id_error(self):
         with pytest.raises(ValueError):
-            android_board.NodePositions(
+            android_board.NodePositionController(
                 board_.Node("2"),
                 board_.Node("2"),
             )
@@ -38,25 +44,21 @@ class TestAndroidBoard:
     @pytest.fixture
     def board_model(self, linked_nodes):
         other_nodes = [board_.Node(str(i)) for i in range(5, 10)]
-        positions = android_board.NodePositions(*linked_nodes, *other_nodes)
+        positions = android_board.NodePositionController(*linked_nodes, *other_nodes)
         return android_board.AndroidBoard(positions)
 
-    def test_repr(self, capsys):
-        positions = android_board.NodePositions(
-            board_.Node("1", visited=True),
-            board_.Node("2", visited=True, active=True),
-        )
-        board = android_board.AndroidBoard(positions)
-        print(board)
-        expected = "AndroidBoard(\n1\tX\t0\n0\t0\t0\n0\t0\t0\n)\n"
-        observed = capsys.readouterr().out
-        assert observed == expected
-
     def test_eq(self):
-        positions = android_board.NodePositions()
+        positions = android_board.NodePositionController()
         board_one = android_board.AndroidBoard(positions)
         board_two = android_board.AndroidBoard(positions)
         assert board_one == board_two
+
+    def test_str(self):
+        controller = android_board.NodePositionController()
+        board = android_board.AndroidBoard(controller)
+        expected = "AndroidBoard(\n0\t0\t0\n0\t0\t0\n0\t0\t0\n)"
+        observed = str(board)
+        assert expected == observed
 
     def test_get_sequence(self, linked_nodes, board_model):
         expected = linked_nodes
