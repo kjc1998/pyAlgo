@@ -10,6 +10,13 @@ class Node:
     visited: bool = False
     parent: Optional["Node"] = None
 
+    def __str__(self):
+        if self.active:
+            return "X"
+        elif self.visited:
+            return "1"
+        return "0"
+
 
 class Board(abc.ABC):
     """
