@@ -1,4 +1,5 @@
 import pytest
+import copy
 import dataclasses
 from boards import board as board_, android_board
 
@@ -13,10 +14,13 @@ class TestNodePositionController:
         controller = android_board.NodePositionController()
         node_one = controller.top_centre
         node_two = controller.bottom_right
+
         controller.activate(node_one)
-        assert controller.top_centre.active
+        assert node_one.active and node_one.visited and node_one.parent is None
+
         controller.activate(node_two)
-        assert controller.bottom_right.active
+        assert not node_one.active and node_one.visited
+        assert node_two.active and node_two.visited and node_two.parent == node_one
 
     def test_get_node_by_id(self):
         node_one = board_.Node("1")
@@ -39,12 +43,17 @@ class TestNodePositionController:
                 board_.Node("2"),
             )
 
+    def test_active_node_error(self):
+        controller = android_board.NodePositionController()
+        with pytest.raises(ValueError):
+            controller.get_active_node()
+
 
 class TestAndroidMapper:
-    def test_perimeters(self):
+    def test_get_perimeters(self):
         mapper = android_board.AndroidMapper(3, 3)
         expected = [(0, 0), (0, 1), (0, 2), (1, 0), (1, 2), (2, 0), (2, 1), (2, 2)]
-        observed = mapper._perimeters
+        observed = mapper._get_perimeters()
         assert expected == observed
 
     @pytest.mark.parametrize(
@@ -120,9 +129,21 @@ class TestAndroidMapper:
             # fmt: on
         ],
     )
-    def test_get_path_map(self, row, column, expected):
+    def test_map(self, row, column, expected):
         mapper = android_board.AndroidMapper(row, column)
-        observed = mapper.get_path_map()
+        observed = mapper.map
+        assert expected == observed
+
+    def test_get_paths(self):
+        mapper = android_board.AndroidMapper(3, 3)
+        expected = [
+            [(0, 1), (0, 2)],
+            [(1, 2)],
+            [(2, 1)],
+            [(1, 1), (2, 2)],
+            [(1, 0), (2, 0)],
+        ]
+        observed = mapper.get_paths((0, 0))
         assert expected == observed
 
 
@@ -159,8 +180,43 @@ class TestAndroidBoard:
         observed = board_model.get_sequence()
         assert expected == observed
 
-    def test_active_node_error(self):
-        controller = android_board.NodePositionController()
+    def test_get_next_boards(self):
+        start_node = board_.Node("mid_left", True, True)
+        controller = android_board.NodePositionController(mid_left=start_node)
         board = android_board.AndroidBoard(controller)
-        with pytest.raises(ValueError):
-            board.get_sequence()
+        mapper = android_board.AndroidMapper(3, 3)
+        expected_controllers = [
+            android_board.NodePositionController(
+                top_left=board_.Node("1", True, True, start_node),
+                mid_left=start_node,
+            ),
+            android_board.NodePositionController(
+                top_centre=board_.Node("2", True, True, start_node),
+                mid_left=start_node,
+            ),
+            android_board.NodePositionController(
+                top_right=board_.Node("3", True, True, start_node),
+                mid_left=start_node,
+            ),
+            android_board.NodePositionController(
+                mid_centre=board_.Node("5", True, True, start_node),
+                mid_left=start_node,
+            ),
+            android_board.NodePositionController(
+                bottom_left=board_.Node("7", True, True, start_node),
+                mid_left=start_node,
+            ),
+            android_board.NodePositionController(
+                bottom_centre=board_.Node("8", True, True, start_node),
+                mid_left=start_node,
+            ),
+            android_board.NodePositionController(
+                bottom_right=board_.Node("9", True, True, start_node),
+                mid_left=start_node,
+            ),
+        ]
+
+        expected = [android_board.AndroidBoard(c) for c in expected_controllers]
+        observed = board.get_next_boards(mapper)
+        assert not start_node.active and start_node.visited
+        assert len(expected) == len(observed) and [x in observed for x in expected]

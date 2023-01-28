@@ -1,6 +1,7 @@
 import dataclasses
 import textwrap
 import math
+import copy
 from boards import board
 from typing import Any, Dict, Iterable, NewType, List, Set, Tuple
 
@@ -34,19 +35,29 @@ class NodePositionController:
         """
         return textwrap.dedent(content)
 
+    def get_active_node(self) -> board.Node:
+        for node in self:
+            if node.active:
+                return node
+        raise ValueError("no active node")
+
     def get_node_by_id(self, uid: str) -> board.Node:
         for node in self:
             if node.id == uid:
                 return node
         raise KeyError(f"no such node with id: {uid}")
 
-    def activate(self, active_node: board.Node) -> None:
+    def activate(self, activate: board.Node) -> None:
+        try:
+            active_node = self.get_active_node()
+            active_node.active = False
+        except ValueError:
+            active_node = None
         for node in self:
-            if node.id == active_node.id:
+            if node.id == activate.id:
                 node.active = True
                 node.visited = True
-            else:
-                node.activate = False
+                node.parent = active_node
 
     def __post_init__(self):
         checked_list = []
@@ -60,12 +71,20 @@ class AndroidMapper:
     def __init__(self, row: int, column: int):
         self._indices = [(i, j) for i in range(row) for j in range(column)]
 
-    def get_path_map(self) -> Dict["Coordinate", List[List["Coordinate"]]]:
-        result = {}
-        for index in self._indices:
-            gradients = self._get_gradient_lines(index)
-            result[index] = [self._get_line_indices(index, g) for g in gradients]
-        return result
+    @property
+    def map(self) -> Dict["Coordinate", List[List["Coordinate"]]]:
+        if not hasattr(self, "_result"):
+            self._result = {}
+            for index in self._indices:
+                gradients = self._get_gradient_lines(index)
+                self._result[index] = [
+                    self._get_line_indices(index, g) for g in gradients
+                ]
+        return self._result
+
+    def get_paths(self, index: "Coordinate") -> List[List["Coordinate"]]:
+        map = self.map
+        return map[index]
 
     def _get_line_indices(
         self, index: "Coordinate", gradient: "Coordinate"
@@ -84,7 +103,7 @@ class AndroidMapper:
 
     def _get_gradient_lines(self, index: "Coordinate") -> Set["Coordinate"]:
         result = set()
-        for end_index in self._perimeters:
+        for end_index in self._get_perimeters():
             if index == end_index:
                 continue
             diff_x = end_index[0] - index[0]
@@ -94,8 +113,7 @@ class AndroidMapper:
             result.add(gradient)
         return result
 
-    @property
-    def _perimeters(self) -> List["Coordinate"]:
+    def _get_perimeters(self) -> List["Coordinate"]:
         result = []
         range_x = range(max(self._indices)[0] + 1)
         range_y = range(max(self._indices)[1] + 1)
@@ -109,9 +127,23 @@ class AndroidMapper:
         return result
 
 
+class IndexMapper:
+    def __init__(self, uids: List[str], nodes: List[board.Node]):
+        self._uid_coordinate = {uid: (i // 3, i % 3) for i, uid in enumerate(uids)}
+        self._coordinate_node = dict(zip(self._uid_coordinate.values(), nodes))
+
+    def get_coordinate(self, node: board.Node) -> "Coordinate":
+        return self._uid_coordinate[node.id]
+
+    def get_node(self, coordinate: "Coordinate") -> board.Node:
+        return self._coordinate_node[coordinate]
+
+
 class AndroidBoard(board.Board):
     def __init__(self, controller: "NodePositionController"):
         self._controller = controller
+        self._node_map = {node.id: node for node in controller}
+        self._index_map = IndexMapper(self._node_map.keys(), self._node_map.values())
 
     def __str__(self) -> str:
         return f"{type(self).__name__}(\n{str(self._controller)})"
@@ -123,18 +155,31 @@ class AndroidBoard(board.Board):
         return type(self) == type(other) and self._controller == other._controller
 
     def get_sequence(self) -> List[board.Node]:
-        result = [self._get_active_node()]
+        result = [self._controller.get_active_node()]
         current = result[0]
         while current.parent:
             current = current.parent
             result.insert(0, current)
         return result
 
-    def get_next_boards(self) -> List[board.Board]:
-        raise NotImplementedError
+    def get_next_boards(self, mapper: AndroidMapper) -> List[board.Board]:
+        active_node = self._controller.get_active_node()
+        active_index = self._index_map.get_coordinate(active_node)
+        paths = mapper.get_paths(active_index)
+        next_nodes = self._get_next_nodes(paths)
+        result = []
+        for next_node in next_nodes:
+            controller = copy.copy(self._controller)
+            controller.activate(next_node)
+            result.append(AndroidBoard(controller))
+        return result
 
-    def _get_active_node(self) -> board.Node:
-        for node in self._controller:
-            if node.active:
-                return node
-        raise ValueError("no active node")
+    def _get_next_nodes(self, paths: List[List["Coordinate"]]) -> List[board.Node]:
+        result = []
+        for path in paths:
+            for coordinate in path:
+                node = self._index_map.get_node(coordinate)
+                if not node.visited:
+                    result.append(node)
+                    break
+        return result
