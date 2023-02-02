@@ -1,7 +1,6 @@
 import pytest
-import copy
 import dataclasses
-from boards import board as board_, android_board
+from boards import board as board_, android_board, coordinates
 
 
 class TestNodePositionController:
@@ -50,11 +49,19 @@ class TestNodePositionController:
 
 
 class TestAndroidMapper:
+    def build_two_index(self, value):
+        if isinstance(value, tuple):
+            return coordinates.TwoIndex(*value)
+        if isinstance(value, list):
+            return [coordinates.TwoIndex(*v) for v in value]
+        if isinstance(value, set):
+            return {coordinates.TwoIndex(*v) for v in value}
+
     def test_get_perimeters(self):
         mapper = android_board.AndroidMapper(3, 3)
         expected = [(0, 0), (0, 1), (0, 2), (1, 0), (1, 2), (2, 0), (2, 1), (2, 2)]
-        observed = mapper._get_perimeters()
-        assert expected == observed
+        observed = list(mapper._get_perimeters())
+        assert self.build_two_index(expected) == observed
 
     @pytest.mark.parametrize(
         "index, expected",
@@ -81,8 +88,8 @@ class TestAndroidMapper:
     )
     def test_get_gradient_lines(self, index, expected):
         mapper = android_board.AndroidMapper(3, 3)
-        observed = mapper._get_gradient_lines(index)
-        assert expected == observed
+        observed = mapper._get_gradient_lines(self.build_two_index(index))
+        assert self.build_two_index(expected) == observed
 
     @pytest.mark.parametrize(
         "index, gradient, expected",
