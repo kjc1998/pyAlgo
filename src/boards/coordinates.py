@@ -1,5 +1,5 @@
 import dataclasses
-from typing import Any
+from typing import Union
 
 
 @dataclasses.dataclass
@@ -15,6 +15,9 @@ class TwoIndex:
 
     def __sub__(self, other: "TwoIndex") -> "TwoIndex":
         return TwoIndex(self.x - other.x, self.y - other.y)
+
+    def __mul__(self, other: Union[int, float]) -> "TwoIndex":
+        return TwoIndex(self.x * other, self.y * other)
 
     def __lt__(self, other: "TwoIndex") -> bool:
         return (self.x + self.y) < (other.x + other.y)

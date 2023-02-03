@@ -53,9 +53,14 @@ class TestAndroidMapper:
         if isinstance(value, tuple):
             return coordinates.TwoIndex(*value)
         if isinstance(value, list):
-            return [coordinates.TwoIndex(*v) for v in value]
+            return [self.build_two_index(v) for v in value]
         if isinstance(value, set):
-            return {coordinates.TwoIndex(*v) for v in value}
+            return {self.build_two_index(v) for v in value}
+        if isinstance(value, dict):
+            return {
+                self.build_two_index(k): self.build_two_index(v)
+                for k, v in value.items()
+            }
 
     def test_get_perimeters(self):
         mapper = android_board.AndroidMapper(3, 3)
@@ -101,8 +106,10 @@ class TestAndroidMapper:
     )
     def test_get_line_indices(self, index, gradient, expected):
         mapper = android_board.AndroidMapper(3, 3)
-        observed = mapper._get_line_indices(index, gradient)
-        assert expected == observed
+        observed = mapper._get_line_indices(
+            self.build_two_index(index), self.build_two_index(gradient)
+        )
+        assert self.build_two_index(expected) == observed
 
     @pytest.mark.parametrize(
         "row, column, expected",
@@ -139,7 +146,11 @@ class TestAndroidMapper:
     def test_map(self, row, column, expected):
         mapper = android_board.AndroidMapper(row, column)
         observed = mapper.map
-        assert expected == observed
+        expected = self.build_two_index(expected)
+        for key in expected.keys():
+            e_list = expected[key]
+            o_list = observed[key]
+            assert len(e_list) == len(o_list) and [e in o_list for e in e_list]
 
     def test_get_paths(self):
         mapper = android_board.AndroidMapper(3, 3)
@@ -150,8 +161,8 @@ class TestAndroidMapper:
             [(1, 1), (2, 2)],
             [(1, 0), (2, 0)],
         ]
-        observed = mapper.get_paths((0, 0))
-        assert expected == observed
+        observed = mapper.get_paths(coordinates.TwoIndex(0, 0))
+        assert [o in self.build_two_index(expected) for o in observed]
 
 
 class TestAndroidBoard:

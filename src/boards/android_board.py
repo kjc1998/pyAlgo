@@ -73,12 +73,10 @@ class AndroidMapper:
         ]
 
     @property
-    def map(
-        self,
-    ) -> Dict[coordinates.TwoIndex, List[List[coordinates.TwoIndex]]]:
+    def map(self) -> Dict[coordinates.TwoIndex, List[List[coordinates.TwoIndex]]]:
         if not hasattr(self, "_result"):
             self._result = {}
-            for index in self._indices:
+            for index in self._coordinates:
                 gradients = self._get_gradient_lines(index)
                 self._result[index] = [
                     self._get_line_indices(index, g) for g in gradients
@@ -99,10 +97,9 @@ class AndroidMapper:
         result = []
         mutiplier = 1
         while True:
-            next_x = index[0] + mutiplier * gradient[0]
-            next_y = index[1] + mutiplier * gradient[1]
-            if (next_x, next_y) in self._indices:
-                result.append((next_x, next_y))
+            next_index = index + gradient * mutiplier
+            if next_index in self._coordinates:
+                result.append(next_index)
                 mutiplier += 1
             else:
                 break
@@ -137,7 +134,9 @@ class AndroidMapper:
 
 class IndexMapper:
     def __init__(self, uids: List[str], nodes: List[board.Node]):
-        self._uid_coordinate = {uid: (i // 3, i % 3) for i, uid in enumerate(uids)}
+        self._uid_coordinate = {
+            uid: coordinates.TwoIndex(i // 3, i % 3) for i, uid in enumerate(uids)
+        }
         self._coordinate_node = dict(zip(self._uid_coordinate.values(), nodes))
 
     def get_coordinate(self, node: board.Node) -> coordinates.TwoIndex:

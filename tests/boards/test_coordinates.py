@@ -19,3 +19,9 @@ class TestPositiveCoordinate:
         coord_two = coordinates.TwoIndex(1, 1)
         assert coord_one + coord_two == coordinates.TwoIndex(4, 5)
         assert coord_one - coord_two == coordinates.TwoIndex(2, 3)
+
+    def test_multiplication(self):
+        coord_one = coordinates.TwoIndex(3, 4)
+        expected = coordinates.TwoIndex(9, 12)
+        observed = coord_one * 3
+        assert expected == observed
