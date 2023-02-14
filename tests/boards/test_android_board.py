@@ -193,6 +193,11 @@ class TestAndroidBoard:
         observed = str(board)
         assert expected == observed
 
+    def test_uid(self, board_model):
+        expected = "1234"
+        observed = board_model.uid
+        assert expected == observed
+
     def test_get_sequence(self, linked_nodes, board_model):
         expected = linked_nodes
         observed = board_model.get_sequence()

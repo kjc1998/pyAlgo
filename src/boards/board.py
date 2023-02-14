@@ -47,3 +47,9 @@ class Board(abc.ABC):
     def get_next_boards(self) -> List["Board"]:
         """Get next possible boards given current active node"""
         raise NotImplementedError
+
+    @property
+    @abc.abstractmethod
+    def uid(self) -> str:
+        """Unique id tied to board"""
+        raise NotImplementedError

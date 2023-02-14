@@ -161,6 +161,11 @@ class AndroidBoard(board.Board):
     def __eq__(self, other: Any) -> bool:
         return type(self) == type(other) and self._controller == other._controller
 
+    @property
+    def uid(self) -> str:
+        id_sequence = [n.id for n in self.get_sequence()]
+        return "".join(id_sequence)
+
     def get_sequence(self) -> List[board.Node]:
         result = [self._controller.get_active_node()]
         current = result[0]
