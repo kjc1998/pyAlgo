@@ -1,6 +1,7 @@
 import pytest
 import dataclasses
-from boards import board as board_, android_board, coordinates
+import coordinates
+from boards import board as board_, android_board
 
 
 class TestNodePositionController:
@@ -51,7 +52,7 @@ class TestNodePositionController:
 class TestAndroidMapper:
     def build_two_index(self, value):
         if isinstance(value, tuple):
-            return coordinates.TwoIndex(*value)
+            return coordinates.Coordinate2D(*value)
         if isinstance(value, list):
             return [self.build_two_index(v) for v in value]
         if isinstance(value, set):
@@ -161,7 +162,7 @@ class TestAndroidMapper:
             [(1, 1), (2, 2)],
             [(1, 0), (2, 0)],
         ]
-        observed = mapper.get_paths(coordinates.TwoIndex(0, 0))
+        observed = mapper.get_paths(coordinates.Coordinate2D(0, 0))
         assert [o in self.build_two_index(expected) for o in observed]
 
 

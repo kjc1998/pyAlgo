@@ -3,7 +3,8 @@ import textwrap
 import math
 import copy
 
-from boards import board, coordinates
+import coordinates
+from boards import board
 from typing import Any, Dict, Iterable, List, Set
 
 
@@ -69,11 +70,13 @@ class NodePositionController:
 class AndroidMapper:
     def __init__(self, row: int, column: int):
         self._coordinates = [
-            coordinates.TwoIndex(i, j) for i in range(row) for j in range(column)
+            coordinates.Coordinate2D(i, j) for i in range(row) for j in range(column)
         ]
 
     @property
-    def map(self) -> Dict[coordinates.TwoIndex, List[List[coordinates.TwoIndex]]]:
+    def map(
+        self,
+    ) -> Dict[coordinates.Coordinate2D, List[List[coordinates.Coordinate2D]]]:
         if not hasattr(self, "_result"):
             self._result = {}
             for index in self._coordinates:
@@ -84,16 +87,16 @@ class AndroidMapper:
         return self._result
 
     def get_paths(
-        self, index: coordinates.TwoIndex
-    ) -> List[List[coordinates.TwoIndex]]:
+        self, index: coordinates.Coordinate2D
+    ) -> List[List[coordinates.Coordinate2D]]:
         map = self.map
         return map[index]
 
     def _get_line_indices(
         self,
-        index: coordinates.TwoIndex,
-        gradient: coordinates.TwoIndex,
-    ) -> List[coordinates.TwoIndex]:
+        index: coordinates.Coordinate2D,
+        gradient: coordinates.Coordinate2D,
+    ) -> List[coordinates.Coordinate2D]:
         result = []
         mutiplier = 1
         while True:
@@ -106,21 +109,21 @@ class AndroidMapper:
         return result
 
     def _get_gradient_lines(
-        self, coord: coordinates.TwoIndex
-    ) -> Set[coordinates.TwoIndex]:
+        self, coord: coordinates.Coordinate2D
+    ) -> Set[coordinates.Coordinate2D]:
         result = set()
         for edge in list(self._get_perimeters()):
             if coord == edge:
                 continue
             diff = edge - coord
             divisor = math.gcd(diff.x, diff.y)
-            gradient = coordinates.TwoIndex(
+            gradient = coordinates.Coordinate2D(
                 int(diff.x / divisor), int(diff.y / divisor)
             )
             result.add(gradient)
         return result
 
-    def _get_perimeters(self) -> List[coordinates.TwoIndex]:
+    def _get_perimeters(self) -> List[coordinates.Coordinate2D]:
         range_x = range(max(self._coordinates).x + 1)
         range_y = range(max(self._coordinates).y + 1)
 
@@ -135,14 +138,14 @@ class AndroidMapper:
 class IndexMapper:
     def __init__(self, uids: List[str], nodes: List[board.Node]):
         self._uid_coordinate = {
-            uid: coordinates.TwoIndex(i // 3, i % 3) for i, uid in enumerate(uids)
+            uid: coordinates.Coordinate2D(i // 3, i % 3) for i, uid in enumerate(uids)
         }
         self._coordinate_node = dict(zip(self._uid_coordinate.values(), nodes))
 
-    def get_coordinate(self, node: board.Node) -> coordinates.TwoIndex:
+    def get_coordinate(self, node: board.Node) -> coordinates.Coordinate2D:
         return self._uid_coordinate[node.id]
 
-    def get_node(self, coordinate: coordinates.TwoIndex) -> board.Node:
+    def get_node(self, coordinate: coordinates.Coordinate2D) -> board.Node:
         return self._coordinate_node[coordinate]
 
 
@@ -187,7 +190,7 @@ class AndroidBoard(board.Board):
         return result
 
     def _get_next_nodes(
-        self, paths: List[List[coordinates.TwoIndex]]
+        self, paths: List[List[coordinates.Coordinate2D]]
     ) -> List[board.Node]:
         result = []
         for path in paths:
