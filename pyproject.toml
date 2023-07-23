@@ -1,0 +1,37 @@
+[build-system]
+requires = ["setuptools>=61.2"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pyalgo"
+description = "Python tools for algorithms"
+license = {text = "Unlicense"}
+authors = [{name = "Kai Jie Chow", email = "kj1chow@gmail.com"}]
+classifiers = [
+    "Intended Audience :: Developers",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3.7",
+]
+urls = {Homepage = '"https://github.com/kjc1998/pyAlgo/"'}
+requires-python = ">=3.7"
+dynamic = ["version"]
+
+[project.optional-dependencies]
+test = [
+    "pytest",
+    "pytest-cov",
+    "mypy",
+    "pytest-mypy",
+]
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+platforms = ["any"]
+include-package-data = false
+
+[tool.setuptools.packages.find]
+where = ["src"]
+namespaces = false
+
+[tool.setuptools.dynamic]
+version = {file = ["Versionfile"]}

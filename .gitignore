@@ -8,3 +8,4 @@ __version__.py
 *pip-wheel-metadata/
 .pytest_cache
 .mypy_cache
+dist/

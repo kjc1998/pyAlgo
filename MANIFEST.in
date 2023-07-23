@@ -1,0 +1,5 @@
+include Versionfile
+include README.md
+
+global-exclude tests/*
+global-exclude __pycache__
