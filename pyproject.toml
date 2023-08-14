@@ -14,15 +14,8 @@ classifiers = [
 ]
 urls = {Homepage = '"https://github.com/kjc1998/pyAlgo/"'}
 requires-python = ">=3.7"
+dependencies = ["typing-extensions"]
 dynamic = ["version"]
-
-[project.optional-dependencies]
-test = [
-    "pytest",
-    "pytest-cov",
-    "mypy",
-    "pytest-mypy",
-]
 
 [tool.setuptools]
 package-dir = {"" = "src"}

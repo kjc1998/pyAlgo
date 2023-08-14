@@ -29,7 +29,7 @@ install: package
 
 #' devinstall: install package in development mode
 devinstall: versionfile
-	$(PIP) install -e .[test]
+	$(PIP) install -e .
 
 #' tests: alias for test
 tests: test
@@ -39,23 +39,36 @@ test: typecheck
 
 #` unittest: run unit tests
 unittest:
-	pytest --verbose $(_EXTRA_ARGS) tests
+	pytest --verbose tests
 
 #' typecheck: check type annotations
 typecheck:
 	pytest --verbose --mypy-config-file=mypy.ini tests
 
-clean:
-	rm -rf dist
-	rm -rf pyalgo.egg-info
-	rm -rf **/pyalgo.egg-info
-	rm -rf pip-wheel-metadata
-	rm -rf $(PACKAGE_FILE)
-	rm -f $(VERSION_FILE)
-	find . -type d -iname __pycache__ | xargs rm -rf
-	find . -type f -iname '*.pyc' | xargs rm -rf
-	rm -rf .pytest_cache
-	rm -f .coverage
-	rm -rf .mypy_cache
+#' clean: remove all build, test, coverage and Python artifacts
+clean: clean-build clean-pyc clean-test
 
-.PHONY: devinstall install tests clean versionfile package
+#' clean-build: remove build artifacts'
+clean-build:
+	rm -fr build/
+	rm -fr dist/
+	rm -fr .eggs/
+	find . -name '*.egg-info' -exec rm -fr {} +
+	find . -name '*.egg' -exec rm -f {} +
+
+#' clean-pyc: remove Python file artifacts
+clean-pyc:
+	find . -name '*.pyc' -exec rm -f {} +
+	find . -name '*.pyo' -exec rm -f {} +
+	find . -name '*~' -exec rm -f {} +
+	find . -name '__pycache__' -exec rm -fr {} +
+
+#' clean-test: remove test and coverage artifacts
+clean-test:
+	rm -fr .tox/
+	rm -f .coverage
+	rm -fr htmlcov/
+	rm -fr .pytest_cache
+	rm -fr .mypy_cache
+
+.PHONY: devinstall install tests clean clean-build clean-pyc clean-test versionfile package
