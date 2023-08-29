@@ -1,4 +1,5 @@
-from typing import Dict, Generic, Iterable, List, Optional
+from typing import Generic, Iterable, List, Optional
+from pyalgo import models
 from pyalgo.queue import queue
 
 
@@ -8,33 +9,28 @@ class EmptyQueueError(ValueError):
         super().__init__(message)
 
 
-class SimpleQueue(queue.Queue, Generic[queue.Element]):
-    def __init__(self, elements: Optional[Iterable[queue.Element]] = None):
-        self._elements: List[queue.Element]
-        self._uid_lookup: Dict[str, int]
-
-        if elements is None:
-            self._elements = []
-            self._uid_lookup = {}
-        else:
+class SimpleQueue(queue.Queue, Generic[models.Element]):
+    def __init__(self, elements: Optional[Iterable[models.Element]] = None):
+        self._elements: List[models.Element] = []
+        if elements is not None:
             self._elements = list(elements)
-            self._uid_lookup = {e.uid: i for i, e in enumerate(self._elements)}
 
-    def get(self) -> queue.Element:
+    def get(self) -> models.Element:
         try:
             result = self._elements.pop(0)
         except IndexError:
             raise EmptyQueueError()
 
-        del self._uid_lookup[result.uid]
         return result
 
-    def add(self, element: queue.Element) -> None:
+    def add(self, element: models.Element) -> None:
         self._elements.append(element)
-        self._uid_lookup[element.uid] = len(self._elements) - 1
 
     def remove(self, uid: str) -> None:
-        pass
+        for i, element in enumerate(self._elements):
+            if element.uid == uid:
+                del self._elements[i]
+                break
 
-    def replace(self, uid: str, element: queue.Element) -> None:
+    def replace(self, uid: str, element: models.Element) -> None:
         pass
