@@ -3,7 +3,17 @@ from typing import Generic
 from pyalgo import models
 
 
+class EmptyQueueError(ValueError):
+    def __init__(self) -> None:
+        message = "cannot get element from empty queue"
+        super().__init__(message)
+
+
 class Queue(abc.ABC, Generic[models.Element]):
+    @abc.abstractmethod
+    def __len__(self) -> int:
+        """Length of queue"""
+
     @abc.abstractmethod
     def get(self) -> models.Element:
         """Retrieve `Element` from queue"""

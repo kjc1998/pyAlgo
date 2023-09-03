@@ -1,25 +1,22 @@
-from typing import Generic, Iterable, List, Optional
+from typing import Iterable, List, Optional
 from pyalgo import models
 from pyalgo.queue import queue
 
 
-class EmptyQueueError(ValueError):
-    def __init__(self):
-        message = "cannot get element from empty queue"
-        super().__init__(message)
-
-
-class SimpleQueue(queue.Queue, Generic[models.Element]):
-    def __init__(self, elements: Optional[Iterable[models.Element]] = None):
+class SimpleQueue(queue.Queue[models.Element]):
+    def __init__(self, elements: Optional[Iterable[models.Element]] = None) -> None:
         self._elements: List[models.Element] = []
         if elements is not None:
             self._elements = list(elements)
+
+    def __len__(self) -> int:
+        return len(self._elements)
 
     def get(self) -> models.Element:
         try:
             result = self._elements.pop(0)
         except IndexError:
-            raise EmptyQueueError()
+            raise queue.EmptyQueueError()
 
         return result
 
@@ -33,4 +30,8 @@ class SimpleQueue(queue.Queue, Generic[models.Element]):
                 break
 
     def replace(self, uid: str, element: models.Element) -> None:
-        pass
+        for i, old in enumerate(self._elements):
+            if old.uid == uid:
+                del self._elements[i]
+                self._elements.insert(i, element)
+                break

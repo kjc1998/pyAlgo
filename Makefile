@@ -43,6 +43,9 @@ unittest:
 
 #' typecheck: check type annotations
 typecheck:
+	mypy src \
+		--config-file=mypy.ini \
+		--strict
 	pytest --verbose --mypy-config-file=mypy.ini tests
 
 #' clean: remove all build, test, coverage and Python artifacts
