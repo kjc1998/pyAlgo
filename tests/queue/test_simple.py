@@ -3,7 +3,7 @@ import pytest
 from pyalgo.queue import queue as queue_, simple
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(frozen=True)
 class MockElement:
     uid: str
     value: str
@@ -34,6 +34,8 @@ class TestSimpleQueue:
         assert queue.get() == MockElement("3", "3")
         with pytest.raises(queue_.EmptyQueueError):
             queue.get()
+        with pytest.raises(KeyError):
+            queue.remove("99")
 
     def test_replace(self, queue):
         elements = [MockElement("1", "1"), MockElement("2", "2"), MockElement("3", "3")]
@@ -42,3 +44,5 @@ class TestSimpleQueue:
         expected = [MockElement("1", "1"), MockElement("4", "5"), MockElement("3", "3")]
         observed = [queue.get() for _ in range(len(queue))]
         assert expected == observed
+        with pytest.raises(KeyError):
+            queue.replace("99", MockElement("6", "7"))

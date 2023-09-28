@@ -1,6 +1,25 @@
-from typing import Iterable, List, Optional
+"""
+Example:
+
+from pyalgo.queue.simple import SampleData, SimpleQueue
+
+
+# NOTE: replace `SampleData` with any data structure of your choice, as long as it complies to `ElementProtocol` [defined in `pyalgo.models`]
+e1 = SampleData("1", 5)
+e2 = SampleData("1", 6)
+queue = PriorityQueue[SampleData]([e1, e2])
+"""
+
+import dataclasses
+from typing import Any, Iterable, List, Optional
 from pyalgo import models
 from pyalgo.queue import queue
+
+
+@dataclasses.dataclass
+class SampleData:
+    uid: str
+    value: Any
 
 
 class SimpleQueue(queue.Queue[models.Element]):
@@ -24,14 +43,22 @@ class SimpleQueue(queue.Queue[models.Element]):
         self._elements.append(element)
 
     def remove(self, uid: str) -> None:
+        checked = False
         for i, element in enumerate(self._elements):
             if element.uid == uid:
                 del self._elements[i]
+                checked = True
                 break
+        if not checked:
+            raise KeyError("no such uid stored")
 
     def replace(self, uid: str, element: models.Element) -> None:
+        checked = False
         for i, old in enumerate(self._elements):
             if old.uid == uid:
                 del self._elements[i]
                 self._elements.insert(i, element)
+                checked = True
                 break
+        if not checked:
+            raise KeyError("no such uid stored")
