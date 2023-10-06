@@ -1,7 +1,7 @@
 """
 Example:
 
-from pyalgo.queue.simple import SampleData, SimpleQueue
+from pyalgo.queue.fifo import SampleData, FIFOQueue
 
 
 # NOTE: replace `SampleData` with any data structure of your choice, as long as it complies to `ElementProtocol` [defined in `pyalgo.models`]
@@ -22,7 +22,9 @@ class SampleData:
     value: Any
 
 
-class SimpleQueue(queue.Queue[models.Element]):
+class FIFOQueue(queue.Queue[models.Element]):
+    """First-In, First-Out"""
+
     def __init__(self, elements: Optional[Iterable[models.Element]] = None) -> None:
         self._elements: List[models.Element] = []
         if elements is not None:

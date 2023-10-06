@@ -12,7 +12,7 @@ queue = PriorityQueue[SampleData]([e1, e2])
 
 import dataclasses
 from pyalgo import models
-from pyalgo.queue import simple
+from pyalgo.queue import fifo
 from typing import Iterable, List, Optional
 
 
@@ -47,7 +47,7 @@ class SampleData:
         return False
 
 
-class PriorityQueue(simple.SimpleQueue[models.WeightedElement]):
+class PriorityQueue(fifo.FIFOQueue[models.WeightedElement]):
     def __init__(
         self, elements: Optional[Iterable[models.WeightedElement]] = None
     ) -> None:

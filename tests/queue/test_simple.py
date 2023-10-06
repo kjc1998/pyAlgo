@@ -1,6 +1,6 @@
 import dataclasses
 import pytest
-from pyalgo.queue import queue as queue_, simple
+from pyalgo.queue import queue as queue_, fifo
 
 
 @dataclasses.dataclass(frozen=True)
@@ -9,10 +9,10 @@ class MockElement:
     value: str
 
 
-class TestSimpleQueue:
+class TestFIFOQueue:
     @pytest.fixture
     def queue(self):
-        queue = simple.SimpleQueue[MockElement]()
+        queue = fifo.FIFOQueue[MockElement]()
         return queue
 
     def test_len(self, queue):
