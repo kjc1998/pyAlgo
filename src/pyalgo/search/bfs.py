@@ -5,7 +5,9 @@ from typing import Dict, Generic, List, Optional
 
 
 class _SearchTracker(Generic[models.Element]):
-    """Wrapper class to extend comparison functionality"""
+    """
+    Wrapper class to match signature of `PriorityQueue`, on top of additional properties for tracking `Element`s traversed
+    """
 
     def __init__(self, elements: List[models.Element], level: int):
         self._elements = elements
