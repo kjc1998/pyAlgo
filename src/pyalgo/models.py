@@ -38,6 +38,16 @@ class WeightedElementProtocol(ElementProtocol, Protocol):
 class ElementMap(abc.ABC, Generic[Element]):
     """Map and form relationship patterns between `Element`s"""
 
+    @property
+    @abc.abstractmethod
+    def start(self) -> Element:
+        """Return starting `Element`"""
+
+    @property
+    @abc.abstractmethod
+    def end(self) -> Element:
+        """Return ending `Element`"""
+
     @abc.abstractmethod
     def get_next(self, uid: str) -> List[Element]:
         """Return list of `Element`s given current uid"""
