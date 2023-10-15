@@ -1,17 +1,18 @@
 import dataclasses
 from pyalgo import models
 from pyalgo.queue import queue, priority
-from typing import Any, Callable, Dict, List, Optional, Set
+from pyalgo.search import linked_search
+from typing import Any, Callable, Dict, List, Optional
 
-LinkSearchT = models.LinkSearchProtocol
+LinkedSearchT = linked_search.LinkedSearchProtocol
 
 
 def queue_search(
     map: models.ElementMap[models.Element],
     queue: queue.Queue[Any],
     convert: Callable[
-        [models.Element, Optional[LinkSearchT[models.Element]]],
-        LinkSearchT[models.Element],
+        [models.Element, Optional[LinkedSearchT[models.Element]]],
+        LinkedSearchT[models.Element],
     ],
 ) -> models.SearchResult:
     """
@@ -28,36 +29,36 @@ def queue_search(
     @dataclasses.dataclass(frozen=True)
     class _SearchResult:
         solution: List[models.ElementProtocol] = dataclasses.field(default_factory=list)
-        searches: Dict[str, LinkSearchT[models.Element]] = dataclasses.field(
+        searches: Dict[str, LinkedSearchT[models.Element]] = dataclasses.field(
             default_factory=dict
         )
 
     queue.add(convert(map.start, None))
     result = _SearchResult()
 
-    def _check_visited(search: LinkSearchT[models.Element]) -> bool:
+    def _check_visited(search: LinkedSearchT[models.Element]) -> bool:
         """Check if current tracker has already visited latest `Element`"""
         latest = search.elements[-1]
         return latest in search.elements[:-1]
 
-    def _check_end(search: LinkSearchT[models.Element]) -> bool:
+    def _check_end(search: LinkedSearchT[models.Element]) -> bool:
         """Check if search has reach end `Element`"""
         latest = search.elements[-1]
         return latest.uid == map.end.uid
 
-    def _update_searches(search: LinkSearchT[models.Element]) -> None:
+    def _update_searches(search: LinkedSearchT[models.Element]) -> None:
         """Update search list in FIFO manner"""
         searches = result.searches
         if search.previous_uid and search.previous_uid in searches:
             del searches[search.previous_uid]
         searches[search.uid] = search
 
-    def _update_solution(search: LinkSearchT[models.Element]) -> None:
+    def _update_solution(search: LinkedSearchT[models.Element]) -> None:
         """Populate result with found solution"""
         for e in search.elements:
             result.solution.append(e)
 
-    def _update_queue(search: LinkSearchT[models.Element]) -> None:
+    def _update_queue(search: LinkedSearchT[models.Element]) -> None:
         """Add `Element` to Queue"""
         elements = search.elements
         for e in map.get_next(elements[-1].uid):
@@ -84,84 +85,20 @@ def breadth_first_search(map: models.ElementMap[models.Element]) -> models.Searc
     Perform a Breadth-First Search (DFS) on a given graph from start to end `Element`
     """
 
-    class _SearchTracker:
-        """
-        Wrapper class to match signature of `PriorityQueue`, on top of additional properties for tracking `Element`s traversed
-        NOTE: Subclass of both `LinkSearchProtocol` and `WeightedElementProtocol`
-        """
-
-        def __init__(self, elements: List[models.Element], level: int):
-            self._elements = elements
-            self._level = level
-            self._post_init()
-
-        @property
-        def uid(self) -> str:
-            uids = ",".join([e.uid for e in self._elements])
-            return uids
-
-        @property
-        def previous_uid(self) -> Optional[str]:
-            uids = ",".join([e.uid for e in self._elements[:-1]])
-            return uids if uids else None
-
-        @property
-        def elements(self) -> List[models.Element]:
-            return self._elements
-
-        @property
-        def level(self) -> int:
-            return self._level
-
-        def __eq__(self, other: object) -> bool:
-            if isinstance(other, type(self)):
-                return self._elements == other._elements and self._level == other._level
-            return False
-
-        def __hash__(self) -> int:
-            return hash(self)
-
-        def __lt__(self, other: object) -> bool:
-            if isinstance(other, type(self)):
-                return self._level < other._level
-            return False
-
-        def __le__(self, other: object) -> bool:
-            if isinstance(other, type(self)):
-                return self._level < +other._level
-            return False
-
-        def __mt__(self, other: object) -> bool:
-            if isinstance(other, type(self)):
-                return self._level > other._level
-            return False
-
-        def __me__(self, other: object) -> bool:
-            if isinstance(other, type(self)):
-                return self._level >= other._level
-            return False
-
-        def _post_init(self) -> None:
-            if len(self._elements) == 0:
-                raise ValueError(
-                    "can't instantiate search tracker with empty list of `Element`s"
-                )
-
     def _convert(
-        element: models.Element, previous_search: Optional[LinkSearchT[models.Element]]
-    ) -> LinkSearchT[models.Element]:
+        element: models.Element,
+        previous_search: Optional[LinkedSearchT[models.Element]],
+    ) -> LinkedSearchT[models.Element]:
         if previous_search is None:
-            return _SearchTracker([element], 0)
-        elif isinstance(previous_search, _SearchTracker):
+            return linked_search._BasicSearchTracker([element], 0)
+        elif isinstance(previous_search, linked_search._BasicSearchTracker):
+            # NOTE: Adjusting weight can achieve different search patterns
+            # i.e. for depth-first-search, set the weight to match proportionally with number of elements, ensuring newer elements to be at front
             elements = previous_search.elements
-            return _SearchTracker([*elements, element], previous_search.level - 1)
+            return linked_search._BasicSearchTracker(
+                [*elements, element], previous_search.weight - 1
+            )
         raise NotImplementedError
 
-    queue = priority.PriorityQueue[_SearchTracker]()
+    queue = priority.PriorityQueue[linked_search._BasicSearchTracker[models.Element]]()
     return queue_search(map, queue, _convert)
-
-
-# def dijakstra_search(
-#     map: models.ElementMap[models.WeightedElement],
-# ) -> models.SearchResult:
-#     pass

@@ -21,6 +21,10 @@ class SampleData:
     uid: str
     value: int
 
+    @property
+    def weight(self) -> int:
+        return self.value
+
     def __eq__(self, other: object) -> bool:
         if isinstance(other, type(self)):
             return self.value == other.value

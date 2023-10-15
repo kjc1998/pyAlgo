@@ -1,6 +1,7 @@
 import abc
 import dataclasses
-from typing import Dict, Generic, Iterable, List, TypeVar, Optional
+import decimal
+from typing import Dict, Generic, Iterable, List, TypeVar, Optional, Union
 from typing_extensions import Protocol
 
 Element = TypeVar("Element", bound="ElementProtocol")
@@ -19,30 +20,12 @@ class ElementProtocol(Protocol):
         """Element must be hashable"""
 
 
-class LinkSearchProtocol(ElementProtocol, Protocol[Element]):
-    """
-    Search `Element`s Chaining
-    (NOTE: Wrapper class on top of `Element`, nonetheless still an `Element` with `uid` and `hash` methods)
-    Usage Example:
-        Input: [1, 4, 7, 8]
-        Create 4 unique `LinkSearch`s
-            1) [1]
-            2) [1, 4]
-            3) [1, 4, 7]
-            4) [1, 4, 7, 8]
-    """
-
-    @property
-    def previous_uid(self) -> Optional[str]:
-        """Return previous `LinkSearch` id"""
-
-    @property
-    def elements(self) -> List[Element]:
-        """Return list of `Element`s"""
-
-
 class WeightedElementProtocol(ElementProtocol, Protocol):
     """Similar to `ElementProtocol`, with comparison features"""
+
+    @property
+    def weight(self) -> Union[int, float, decimal.Decimal]:
+        """Return weight of self"""
 
     def __lt__(self, other: object) -> bool:
         """Check if `self` is less than `other`"""
