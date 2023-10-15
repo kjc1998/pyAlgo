@@ -87,7 +87,7 @@ class SimpleMap(models.ElementMap["Element"]):
                 "2": [Element("4"), Element("6")],
                 "3": [Element("5"), Element("end")],
                 "4": [Element("2")],
-                "5": [Element("6")],
+                "5": [],
                 "6": [],
             },
             Element("1"),
@@ -143,9 +143,9 @@ def test_common_search(search, graph, start, expected):
             models.SearchResult(
                 [Element("1"), Element("2"), Element("5"), Element("end")],
                 {
-                    0: [Element("1"), Element("2"), Element("4")],
-                    1: [Element("1"), Element("2"), Element("6")],
-                    2: [Element("1"), Element("3"), Element("7")],
+                    0: [Element("1"), Element("2"), Element("6")],
+                    1: [Element("1"), Element("3"), Element("7")],
+                    2: [Element("1"), Element("2"), Element("4"), Element("7")],
                     3: [Element("1"), Element("2"), Element("5"), Element("8")],
                     4: [Element("1"), Element("2"), Element("5"), Element("end")],
                 },

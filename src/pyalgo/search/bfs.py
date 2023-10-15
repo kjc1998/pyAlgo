@@ -33,23 +33,17 @@ def queue_search(
         )
 
     queue.add(convert(map.start, None))
-    visited: Set[models.Element] = set()
     result = _SearchResult()
 
     def _check_visited(search: LinkSearchT[models.Element]) -> bool:
-        """Check if current element has been visited"""
+        """Check if current tracker has already visited latest `Element`"""
         latest = search.elements[-1]
-        return latest in visited
+        return latest in search.elements[:-1]
 
     def _check_end(search: LinkSearchT[models.Element]) -> bool:
         """Check if search has reach end `Element`"""
         latest = search.elements[-1]
         return latest.uid == map.end.uid
-
-    def _update_visited(search: LinkSearchT[models.Element]) -> None:
-        """Update visited Elements"""
-        latest = search.elements[-1]
-        visited.add(latest)
 
     def _update_searches(search: LinkSearchT[models.Element]) -> None:
         """Update search list in FIFO manner"""
@@ -67,14 +61,12 @@ def queue_search(
         """Add `Element` to Queue"""
         elements = search.elements
         for e in map.get_next(elements[-1].uid):
-            if e not in visited:
-                converted = convert(e, search)
-                queue.add(converted)
+            converted = convert(e, search)
+            queue.add(converted)
 
     while len(queue) > 0:
         search = queue.get()
         if not _check_visited(search):
-            _update_visited(search)
             _update_searches(search)
             if _check_end(search):
                 _update_solution(search)
@@ -167,3 +159,9 @@ def breadth_first_search(map: models.ElementMap[models.Element]) -> models.Searc
 
     queue = priority.PriorityQueue[_SearchTracker]()
     return queue_search(map, queue, _convert)
+
+
+# def dijakstra_search(
+#     map: models.ElementMap[models.WeightedElement],
+# ) -> models.SearchResult:
+#     pass

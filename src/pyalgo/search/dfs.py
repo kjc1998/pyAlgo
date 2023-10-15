@@ -6,7 +6,6 @@ def depth_first_search(map: models.ElementMap[models.Element]) -> models.SearchR
     """
     Perform a Depth-First Search (DFS) on a given graph from start to end `Element`
     """
-    visited = set([map.start])
 
     def _check_end(search: List[models.Element]) -> bool:
         """Check if last element is equal to end"""
@@ -19,8 +18,7 @@ def depth_first_search(map: models.ElementMap[models.Element]) -> models.SearchR
 
         result: List[List[models.Element]] = []
         for e in map.get_next(search[-1].uid):
-            if e not in visited:
-                visited.add(e)
+            if e not in search:
                 result += _dfs([*search, e])
                 if _check_end(result[-1]):
                     break
