@@ -1,73 +1,9 @@
 import dataclasses
 from pyalgo import models
 from pyalgo.queue import queue, priority
-from typing import Any, Callable, Dict, Generic, List, Optional, Set
+from typing import Any, Callable, Dict, List, Optional, Set
 
 LinkSearchT = models.LinkSearchProtocol
-
-
-class _SearchTracker(Generic[models.Element]):
-    """
-    Wrapper class to match signature of `PriorityQueue`, on top of additional properties for tracking `Element`s traversed
-    NOTE: Subclass of both `LinkSearchProtocol` and `WeightedElementProtocol`
-    """
-
-    def __init__(self, elements: List[models.Element], level: int):
-        self._elements = elements
-        self._level = level
-        self._post_init()
-
-    @property
-    def uid(self) -> str:
-        uids = ",".join([e.uid for e in self._elements])
-        return uids
-
-    @property
-    def previous_uid(self) -> Optional[str]:
-        uids = ",".join([e.uid for e in self._elements[:-1]])
-        return uids if uids else None
-
-    @property
-    def elements(self) -> List[models.Element]:
-        return self._elements
-
-    @property
-    def level(self) -> int:
-        return self._level
-
-    def __eq__(self, other: object) -> bool:
-        if isinstance(other, type(self)):
-            return self._elements == other._elements and self._level == other._level
-        return False
-
-    def __hash__(self) -> int:
-        return hash(self)
-
-    def __lt__(self, other: object) -> bool:
-        if isinstance(other, type(self)):
-            return self._level < other._level
-        return False
-
-    def __le__(self, other: object) -> bool:
-        if isinstance(other, type(self)):
-            return self._level < +other._level
-        return False
-
-    def __mt__(self, other: object) -> bool:
-        if isinstance(other, type(self)):
-            return self._level > other._level
-        return False
-
-    def __me__(self, other: object) -> bool:
-        if isinstance(other, type(self)):
-            return self._level >= other._level
-        return False
-
-    def _post_init(self) -> None:
-        if len(self._elements) == 0:
-            raise ValueError(
-                "can't instantiate search tracker with empty list of `Element`s"
-            )
 
 
 def queue_search(
@@ -156,6 +92,69 @@ def breadth_first_search(map: models.ElementMap[models.Element]) -> models.Searc
     Perform a Breadth-First Search (DFS) on a given graph from start to end `Element`
     """
 
+    class _SearchTracker:
+        """
+        Wrapper class to match signature of `PriorityQueue`, on top of additional properties for tracking `Element`s traversed
+        NOTE: Subclass of both `LinkSearchProtocol` and `WeightedElementProtocol`
+        """
+
+        def __init__(self, elements: List[models.Element], level: int):
+            self._elements = elements
+            self._level = level
+            self._post_init()
+
+        @property
+        def uid(self) -> str:
+            uids = ",".join([e.uid for e in self._elements])
+            return uids
+
+        @property
+        def previous_uid(self) -> Optional[str]:
+            uids = ",".join([e.uid for e in self._elements[:-1]])
+            return uids if uids else None
+
+        @property
+        def elements(self) -> List[models.Element]:
+            return self._elements
+
+        @property
+        def level(self) -> int:
+            return self._level
+
+        def __eq__(self, other: object) -> bool:
+            if isinstance(other, type(self)):
+                return self._elements == other._elements and self._level == other._level
+            return False
+
+        def __hash__(self) -> int:
+            return hash(self)
+
+        def __lt__(self, other: object) -> bool:
+            if isinstance(other, type(self)):
+                return self._level < other._level
+            return False
+
+        def __le__(self, other: object) -> bool:
+            if isinstance(other, type(self)):
+                return self._level < +other._level
+            return False
+
+        def __mt__(self, other: object) -> bool:
+            if isinstance(other, type(self)):
+                return self._level > other._level
+            return False
+
+        def __me__(self, other: object) -> bool:
+            if isinstance(other, type(self)):
+                return self._level >= other._level
+            return False
+
+        def _post_init(self) -> None:
+            if len(self._elements) == 0:
+                raise ValueError(
+                    "can't instantiate search tracker with empty list of `Element`s"
+                )
+
     def _convert(
         element: models.Element, previous_search: Optional[LinkSearchT[models.Element]]
     ) -> LinkSearchT[models.Element]:
@@ -166,5 +165,5 @@ def breadth_first_search(map: models.ElementMap[models.Element]) -> models.Searc
             return _SearchTracker([*elements, element], previous_search.level - 1)
         raise NotImplementedError
 
-    queue = priority.PriorityQueue[_SearchTracker[models.Element]]()
+    queue = priority.PriorityQueue[_SearchTracker]()
     return queue_search(map, queue, _convert)
