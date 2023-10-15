@@ -9,6 +9,7 @@ LinkSearchT = models.LinkSearchProtocol
 class _SearchTracker(Generic[models.Element]):
     """
     Wrapper class to match signature of `PriorityQueue`, on top of additional properties for tracking `Element`s traversed
+    NOTE: Subclass of both `LinkSearchProtocol` and `WeightedElementProtocol`
     """
 
     def __init__(self, elements: List[models.Element], level: int):
