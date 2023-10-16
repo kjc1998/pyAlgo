@@ -1,5 +1,4 @@
 import pytest
-import dataclasses
 from pyalgo.queue import priority
 
 
