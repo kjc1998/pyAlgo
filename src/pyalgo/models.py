@@ -6,7 +6,13 @@ from typing_extensions import Protocol
 
 Element = TypeVar("Element", bound="ElementProtocol")
 WeightedElement = TypeVar("WeightedElement", bound="WeightedElementProtocol")
-ComparableElement = TypeVar("ComparableElement", bound="ComparableElementProtocol")
+ComparableElement = TypeVar(
+    "ComparableElement",
+    "ComparableElementProtocol",
+    int,
+    float,
+    str,
+)
 
 
 class ElementProtocol(Protocol):

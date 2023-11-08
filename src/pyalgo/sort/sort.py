@@ -15,4 +15,6 @@ def quick_sort(
             left.append(item)
         else:
             right.append(item)
-    return [*quick_sort(left), pivot, *quick_sort(right)]
+
+    # can't do [*quick_sort(left), ...] because mypy has trouble recognising internal types
+    return [i for i in quick_sort(left)] + [pivot] + [i for i in quick_sort(right)]
