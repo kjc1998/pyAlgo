@@ -3,6 +3,13 @@ from pyalgo.sort import sort
 
 
 @pytest.mark.parametrize(
+    "func",
+    [
+        pytest.param(sort.quick_sort, id="quick_sort"),
+        pytest.param(sort.merge_sort, id="merge_sort"),
+    ],
+)
+@pytest.mark.parametrize(
     "input, expected",
     [
         pytest.param([], [], id="empty_case"),
@@ -11,6 +18,6 @@ from pyalgo.sort import sort
         pytest.param([1, 2, 2, 5, 5, 3, 3], [1, 2, 2, 3, 3, 5, 5], id="repeated_case"),
     ],
 )
-def test_sort(input, expected):
-    observed = sort.quick_sort(input)
+def test_sort(func, input, expected):
+    observed = func(input)
     assert expected == observed
