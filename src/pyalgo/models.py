@@ -47,11 +47,11 @@ class WeightedElementProtocol(ElementProtocol, Protocol):
         """Check if `self` is less than or equal to `other`"""
 
     @abc.abstractmethod
-    def __mt__(self, other: object) -> bool:
+    def __gt__(self, other: object) -> bool:
         """Check if `self` weighs more than `other`"""
 
     @abc.abstractmethod
-    def __me__(self, other: object) -> bool:
+    def __ge__(self, other: object) -> bool:
         """Check if `self` weighs more than or equal to `other`"""
 
 
@@ -105,9 +105,9 @@ class ComparableElementProtocol(Hashable, Protocol):
         """Check if `self` is less or equal than `other`"""
 
     @abc.abstractmethod
-    def __mt__(self, other: object) -> bool:
+    def __gt__(self, other: object) -> bool:
         """Check if `self` is greater than `other`"""
 
     @abc.abstractmethod
-    def __me__(self, other: object) -> bool:
+    def __ge__(self, other: object) -> bool:
         """Check if `self` is greater or equal to `other`"""
