@@ -25,12 +25,12 @@ class Element:
             return self.weight <= other.weight
         return False
 
-    def __mt__(self, other: object) -> bool:
+    def __gt__(self, other: object) -> bool:
         if isinstance(other, type(self)):
             return self.weight > other.weight
         return False
 
-    def __me__(self, other: object) -> bool:
+    def __ge__(self, other: object) -> bool:
         if isinstance(other, type(self)):
             return self.weight >= other.weight
         return False

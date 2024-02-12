@@ -1,19 +1,81 @@
+import decimal
 import dataclasses
 from pyalgo import models
 from pyalgo.queue import queue, priority
 from pyalgo.search import linked_search
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any, Callable, Dict, Generic, List, Optional, Union
 
 LinkedSearchT = linked_search.LinkedSearchProtocol
+
+
+class _BasicSearchTracker(Generic[models.Element]):
+    """
+    Wrapper class to match signature of `PriorityQueue`, on top of additional properties for tracking `Element`s traversed
+    NOTE: Subclass of both `LinkedSearchProtocol` and `WeightedElementProtocol`
+    """
+
+    def __init__(self, elements: List[models.Element]):
+        self.__elements = elements
+        self.__post_init()
+
+    @property
+    def uid(self) -> str:
+        uids = ",".join([e.uid for e in self.__elements])
+        return uids
+
+    @property
+    def previous_uid(self) -> Optional[str]:
+        uids = ",".join([e.uid for e in self.__elements[:-1]])
+        return uids if uids else None
+
+    @property
+    def elements(self) -> List[models.Element]:
+        return self.__elements
+
+    @property
+    def weight(self) -> Union[int, float, decimal.Decimal]:
+        weight = -1 * len(self.__elements)
+        return weight
+
+    def __eq__(self, other: object) -> bool:
+        if isinstance(other, type(self)):
+            return self.__elements == other.__elements and self.weight == other.weight
+        return False
+
+    def __hash__(self) -> int:
+        return hash(self)
+
+    def __lt__(self, other: object) -> bool:
+        if isinstance(other, type(self)):
+            return self.weight < other.weight
+        return False
+
+    def __le__(self, other: object) -> bool:
+        if isinstance(other, type(self)):
+            return self.weight <= other.weight
+        return False
+
+    def __gt__(self, other: object) -> bool:
+        if isinstance(other, type(self)):
+            return self.weight > other.weight
+        return False
+
+    def __ge__(self, other: object) -> bool:
+        if isinstance(other, type(self)):
+            return self.weight >= other.weight
+        return False
+
+    def __post_init(self) -> None:
+        if len(self.__elements) == 0:
+            raise ValueError(
+                "can't instantiate search tracker with empty list of `Element`s"
+            )
 
 
 def queue_search(
     map: models.ElementMap[models.Element],
     queue: queue.Queue[Any],
-    convert: Callable[
-        [models.Element, Optional[LinkedSearchT[models.Element]]],
-        LinkedSearchT[models.Element],
-    ],
+    convert: Callable[[List[models.Element]], LinkedSearchT[models.Element]],
 ) -> models.SearchResult:
     """
     Generic method for traversing through mapped `Element`s
@@ -33,7 +95,7 @@ def queue_search(
             default_factory=dict
         )
 
-    queue.add(convert(map.start, None))
+    queue.add(convert([map.start]))
     result = _SearchResult()
 
     def _check_visited(search: LinkedSearchT[models.Element]) -> bool:
@@ -62,7 +124,7 @@ def queue_search(
         """Add `Element` to Queue"""
         elements = search.elements
         for e in map.get_next(elements[-1].uid):
-            converted = convert(e, search)
+            converted = convert([*search.elements, e])
             queue.add(converted)
 
     while len(queue) > 0:
@@ -85,20 +147,11 @@ def breadth_first_search(map: models.ElementMap[models.Element]) -> models.Searc
     Perform a Breadth-First Search (DFS) on a given graph from start to end `Element`
     """
 
-    def _convert(
-        element: models.Element,
-        previous_search: Optional[LinkedSearchT[models.Element]],
-    ) -> LinkedSearchT[models.Element]:
-        if previous_search is None:
-            return linked_search._BasicSearchTracker([element], 0)
-        elif isinstance(previous_search, linked_search._BasicSearchTracker):
-            # NOTE: Adjusting weight can achieve different search patterns
-            # i.e. for depth-first-search, set the weight to match proportionally with number of elements, ensuring newer elements to be at front
-            elements = previous_search.elements
-            return linked_search._BasicSearchTracker(
-                [*elements, element], previous_search.weight - 1
-            )
-        raise NotImplementedError
+    def _convert(elements: List[models.Element]) -> _BasicSearchTracker[models.Element]:
+        # NOTE: Adjusting weight can achieve different search patterns
+        # i.e. for depth-first-search, set the weight to match proportionally with number of elements, ensuring newer elements to be at front
+        # in breadth-first-search, set the weight based on levels in reversed order
+        return _BasicSearchTracker(elements)
 
-    queue = priority.PriorityQueue[linked_search._BasicSearchTracker[models.Element]]()
+    queue = priority.PriorityQueue[_BasicSearchTracker[models.Element]]()
     return queue_search(map, queue, _convert)

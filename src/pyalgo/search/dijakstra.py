@@ -1,9 +1,19 @@
+import decimal
 from pyalgo import models
 from pyalgo.queue import priority
 from pyalgo.search import linked_search, bfs
-from typing import Optional
+from typing import List, Union
 
 LinkedSearchT = linked_search.LinkedSearchProtocol
+
+
+class _DijakstraPathTracker(bfs._BasicSearchTracker[models.WeightedElement]):
+    def __init__(self, elements: List[models.WeightedElement]):
+        super().__init__(elements)
+
+    @property
+    def weight(self) -> Union[int, float, decimal.Decimal]:
+        return sum([e.weight for e in self.__elements])
 
 
 def dijakstra_search(
@@ -14,18 +24,5 @@ def dijakstra_search(
     Subset of breadth-first-search, with minor tweaks around weightage assignment
     """
 
-    def _convert(
-        element: models.WeightedElement,
-        previous_search: Optional[LinkedSearchT[models.WeightedElement]],
-    ) -> LinkedSearchT[models.WeightedElement]:
-        if previous_search is None:
-            return linked_search._DijakstraPathTracker([element])
-        elif isinstance(previous_search, linked_search._DijakstraPathTracker):
-            elements = previous_search.elements
-            return linked_search._DijakstraPathTracker([*elements, element])
-        raise NotImplementedError
-
-    queue = priority.PriorityQueue[
-        linked_search._DijakstraPathTracker[models.WeightedElement]
-    ]()
-    return bfs.queue_search(map, queue, _convert)
+    queue = priority.PriorityQueue[_DijakstraPathTracker[models.WeightedElement]]()
+    return bfs.queue_search(map, queue, lambda x: _DijakstraPathTracker(x))
