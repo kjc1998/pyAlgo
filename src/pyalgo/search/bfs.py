@@ -3,15 +3,15 @@ import dataclasses
 from pyalgo import models
 from pyalgo.queue import queue, priority
 from pyalgo.search import linked_search
-from typing import Any, Callable, Dict, Generic, List, Optional, Union
+from typing import Any, Callable, Dict, List, Optional, Union
 
-LinkedSearchT = linked_search.LinkedSearchProtocol
+SearchTracker = linked_search.SearchTracker
 
 
-class _BasicSearchTracker(Generic[models.Element]):
+class _BFSSearchTracker(SearchTracker[models.Element]):
     """
     Wrapper class to match signature of `PriorityQueue`, on top of additional properties for tracking `Element`s traversed
-    NOTE: Subclass of both `LinkedSearchProtocol` and `WeightedElementProtocol`
+    NOTE: Subclass of both `SearchTracker` and `WeightedElementProtocol`
     """
 
     def __init__(self, elements: List[models.Element]):
@@ -34,6 +34,10 @@ class _BasicSearchTracker(Generic[models.Element]):
 
     @property
     def weight(self) -> Union[int, float, decimal.Decimal]:
+        """
+        Weightage is dependent on number of elements stored.
+        The greater the number, the lower its priority.
+        """
         weight = -1 * len(self.__elements)
         return weight
 
@@ -75,7 +79,7 @@ class _BasicSearchTracker(Generic[models.Element]):
 def queue_search(
     map: models.ElementMap[models.Element],
     queue: queue.Queue[Any],
-    convert: Callable[[List[models.Element]], LinkedSearchT[models.Element]],
+    convert: Callable[[List[models.Element]], SearchTracker[models.Element]],
 ) -> models.SearchResult:
     """
     Generic method for traversing through mapped `Element`s
@@ -91,36 +95,36 @@ def queue_search(
     @dataclasses.dataclass(frozen=True)
     class _SearchResult:
         solution: List[models.ElementProtocol] = dataclasses.field(default_factory=list)
-        searches: Dict[str, LinkedSearchT[models.Element]] = dataclasses.field(
+        searches: Dict[str, SearchTracker[models.Element]] = dataclasses.field(
             default_factory=dict
         )
 
     queue.add(convert([map.start]))
     result = _SearchResult()
 
-    def _check_visited(search: LinkedSearchT[models.Element]) -> bool:
+    def _check_visited(search: SearchTracker[models.Element]) -> bool:
         """Check if current tracker has already visited latest `Element`"""
         latest = search.elements[-1]
         return latest in search.elements[:-1]
 
-    def _check_end(search: LinkedSearchT[models.Element]) -> bool:
+    def _check_end(search: SearchTracker[models.Element]) -> bool:
         """Check if search has reach end `Element`"""
         latest = search.elements[-1]
         return latest.uid == map.end.uid
 
-    def _update_searches(search: LinkedSearchT[models.Element]) -> None:
+    def _update_searches(search: SearchTracker[models.Element]) -> None:
         """Update search list in FIFO manner"""
         searches = result.searches
         if search.previous_uid and search.previous_uid in searches:
             del searches[search.previous_uid]
         searches[search.uid] = search
 
-    def _update_solution(search: LinkedSearchT[models.Element]) -> None:
+    def _update_solution(search: SearchTracker[models.Element]) -> None:
         """Populate result with found solution"""
         for e in search.elements:
             result.solution.append(e)
 
-    def _update_queue(search: LinkedSearchT[models.Element]) -> None:
+    def _update_queue(search: SearchTracker[models.Element]) -> None:
         """Add `Element` to Queue"""
         elements = search.elements
         for e in map.get_next(elements[-1].uid):
@@ -147,11 +151,11 @@ def breadth_first_search(map: models.ElementMap[models.Element]) -> models.Searc
     Perform a Breadth-First Search (DFS) on a given graph from start to end `Element`
     """
 
-    def _convert(elements: List[models.Element]) -> _BasicSearchTracker[models.Element]:
+    def _convert(elements: List[models.Element]) -> _BFSSearchTracker[models.Element]:
         # NOTE: Adjusting weight can achieve different search patterns
         # i.e. for depth-first-search, set the weight to match proportionally with number of elements, ensuring newer elements to be at front
         # in breadth-first-search, set the weight based on levels in reversed order
-        return _BasicSearchTracker(elements)
+        return _BFSSearchTracker(elements)
 
-    queue = priority.PriorityQueue[_BasicSearchTracker[models.Element]]()
+    queue = priority.PriorityQueue[_BFSSearchTracker[models.Element]]()
     return queue_search(map, queue, _convert)

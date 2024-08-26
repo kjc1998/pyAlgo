@@ -1,18 +1,21 @@
 import decimal
 from pyalgo import models
 from pyalgo.queue import priority
-from pyalgo.search import linked_search, bfs
+from pyalgo.search import bfs
 from typing import List, Union
 
-LinkedSearchT = linked_search.LinkedSearchProtocol
 
 
-class _DijakstraPathTracker(bfs._BasicSearchTracker[models.WeightedElement]):
+class _DijakstraPathTracker(bfs._BFSSearchTracker[models.WeightedElement]):
     def __init__(self, elements: List[models.WeightedElement]):
         super().__init__(elements)
+        self.__elements = elements
 
     @property
     def weight(self) -> Union[int, float, decimal.Decimal]:
+        """
+        Weight grows with the total sum of elements' weights.
+        """
         return sum([e.weight for e in self.__elements])
 
 

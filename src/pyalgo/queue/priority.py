@@ -61,6 +61,10 @@ class PriorityQueue(fifo.FIFOQueue[models.WeightedElement]):
             self._elements = list(elements)
 
     def add(self, element: models.WeightedElement) -> None:
+        """
+        Queue elements based on their respective weights.
+        Heavy weighted elements have higher priorities.
+        """
         inserted = False
         for i, e in enumerate(self._elements):
             if element > e:
