@@ -13,7 +13,7 @@ queue = PriorityQueue[SampleData]([e1, e2])
 import dataclasses
 from pyalgo import models
 from pyalgo.queue import fifo
-from typing import Iterable, List, Optional
+from typing import Any, Iterable, List, Optional
 
 
 @dataclasses.dataclass(frozen=True)
@@ -60,7 +60,7 @@ class PriorityQueue(fifo.FIFOQueue[models.WeightedElement]):
         if elements is not None:
             self._elements = list(elements)
 
-    def add(self, element: models.WeightedElement) -> None:
+    def add(self, element: Any) -> None:
         """
         Queue elements based on their respective weights.
         Heavy weighted elements have higher priorities.

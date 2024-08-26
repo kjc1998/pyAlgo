@@ -1,5 +1,5 @@
 import abc
-from typing import Generic
+from typing import Any, Generic
 from pyalgo import models
 
 
@@ -19,13 +19,9 @@ class Queue(abc.ABC, Generic[models.Element]):
         """Retrieve `Element` from queue"""
 
     @abc.abstractmethod
-    def add(self, element: models.Element) -> None:
+    def add(self, element: Any) -> None:
         """Add `Element` to queue"""
 
     @abc.abstractmethod
     def remove(self, uid: str) -> None:
         """Remove `Element` from queue based on uid"""
-
-    @abc.abstractmethod
-    def replace(self, uid: str, element: models.Element) -> None:
-        """Replace `Element` based on uid"""

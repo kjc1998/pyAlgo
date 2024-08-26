@@ -2,7 +2,7 @@ import pytest
 import dataclasses
 from typing import Dict, List, Union
 from pyalgo import models
-from pyalgo.search import dijakstra
+from pyalgo.search import queue_search, dijakstra
 
 
 @dataclasses.dataclass(frozen=True)
@@ -63,7 +63,7 @@ class SimpleMap(models.ElementMap["Element"]):
         pytest.param(
             {"end": []},
             Element("end", 0),
-            models.SearchResult([Element("end", 0)], {0: [Element("end", 0)]}),
+            queue_search.SearchResult([Element("end", 0)], {0: [Element("end", 0)]}),
             id="start_eq_end_case",
         )
     ],

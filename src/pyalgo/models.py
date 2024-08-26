@@ -1,11 +1,12 @@
 import abc
-import dataclasses
 import decimal
-from typing import Dict, Generic, Iterable, List, TypeVar, Union, Hashable
+from typing import Generic, List, TypeVar, Union, Hashable
 from typing_extensions import Protocol
 
-Element = TypeVar("Element", bound="ElementProtocol")
-WeightedElement = TypeVar("WeightedElement", bound="WeightedElementProtocol")
+Element = TypeVar("Element", bound="ElementProtocol", covariant=True)
+WeightedElement = TypeVar(
+    "WeightedElement", bound="WeightedElementProtocol", covariant=True
+)
 ComparableElement = TypeVar(
     "ComparableElement",
     "ComparableElementProtocol",
@@ -71,20 +72,6 @@ class ElementMap(abc.ABC, Generic[Element]):
     @abc.abstractmethod
     def get_next(self, uid: str) -> List[Element]:
         """Return list of `Element`s given current uid"""
-
-
-@dataclasses.dataclass
-class SearchResult:
-    """
-    Search Result Model
-    solution:   List of `Element`s from start to end
-    searches:   Dict of searches done in order from 0 to n-1
-    """
-
-    solution: Iterable[ElementProtocol] = dataclasses.field(default_factory=list)
-    searches: Dict[int, Iterable[ElementProtocol]] = dataclasses.field(
-        default_factory=dict
-    )
 
 
 class ComparableElementProtocol(Hashable, Protocol):

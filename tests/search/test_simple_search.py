@@ -2,7 +2,7 @@ import pytest
 import dataclasses
 from typing import Dict, List
 from pyalgo import models
-from pyalgo.search import dfs, bfs
+from pyalgo.search import queue_search, dfs, bfs
 
 
 @dataclasses.dataclass(frozen=True)
@@ -37,7 +37,7 @@ class SimpleMap(models.ElementMap["Element"]):
         pytest.param(
             {"end": []},
             Element("end"),
-            models.SearchResult([Element("end")], {0: [Element("end")]}),
+            queue_search.SearchResult([Element("end")], {0: [Element("end")]}),
             id="start_eq_end_case",
         ),
         pytest.param(
@@ -49,7 +49,7 @@ class SimpleMap(models.ElementMap["Element"]):
                 "5": [],
             },
             Element("1"),
-            models.SearchResult(
+            queue_search.SearchResult(
                 [Element("1"), Element("3"), Element("end")],
                 {
                     0: [Element("1"), Element("2"), Element("4")],
@@ -70,7 +70,7 @@ class SimpleMap(models.ElementMap["Element"]):
                 "7": [],
             },
             Element("1"),
-            models.SearchResult(
+            queue_search.SearchResult(
                 [],
                 {
                     0: [Element("1"), Element("2"), Element("4")],
@@ -91,7 +91,7 @@ class SimpleMap(models.ElementMap["Element"]):
                 "6": [],
             },
             Element("1"),
-            models.SearchResult(
+            queue_search.SearchResult(
                 [Element("1"), Element("3"), Element("end")],
                 {
                     0: [Element("1"), Element("2"), Element("4")],
@@ -105,7 +105,9 @@ class SimpleMap(models.ElementMap["Element"]):
         pytest.param(
             {"1": [Element("2")], "2": [Element("3")], "3": [Element("1")]},
             Element("1"),
-            models.SearchResult([], {0: [Element("1"), Element("2"), Element("3")]}),
+            queue_search.SearchResult(
+                [], {0: [Element("1"), Element("2"), Element("3")]}
+            ),
             id="cyclic_no_solution_case",
         ),
     ],
@@ -122,7 +124,7 @@ def test_common_search(search, graph, start, expected):
     [
         pytest.param(
             dfs.depth_first_search,
-            models.SearchResult(
+            queue_search.SearchResult(
                 [Element("1"), Element("2"), Element("5"), Element("end")],
                 {
                     0: [Element("1"), Element("2"), Element("4"), Element("7")],
@@ -140,7 +142,7 @@ def test_common_search(search, graph, start, expected):
         ),
         pytest.param(
             bfs.breadth_first_search,
-            models.SearchResult(
+            queue_search.SearchResult(
                 [Element("1"), Element("2"), Element("5"), Element("end")],
                 {
                     0: [Element("1"), Element("2"), Element("6")],

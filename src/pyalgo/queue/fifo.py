@@ -41,7 +41,7 @@ class FIFOQueue(queue.Queue[models.Element]):
 
         return result
 
-    def add(self, element: models.Element) -> None:
+    def add(self, element: Any) -> None:
         self._elements.append(element)
 
     def remove(self, uid: str) -> None:
@@ -49,17 +49,6 @@ class FIFOQueue(queue.Queue[models.Element]):
         for i, element in enumerate(self._elements):
             if element.uid == uid:
                 del self._elements[i]
-                checked = True
-                break
-        if not checked:
-            raise KeyError("no such uid stored")
-
-    def replace(self, uid: str, element: models.Element) -> None:
-        checked = False
-        for i, old in enumerate(self._elements):
-            if old.uid == uid:
-                del self._elements[i]
-                self._elements.insert(i, element)
                 checked = True
                 break
         if not checked:
