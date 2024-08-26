@@ -4,6 +4,7 @@ from pyalgo.queue import priority
 from pyalgo.search import bfs
 from typing import List, Union
 
+
 class _DFSSearchTracker(bfs._BFSSearchTracker[models.Element]):
     def __init__(self, elements: List[models.Element]):
         super().__init__(elements)
@@ -17,10 +18,11 @@ class _DFSSearchTracker(bfs._BFSSearchTracker[models.Element]):
         """
         return len(self.__elements)
 
+
 def depth_first_search(map: models.ElementMap[models.Element]) -> models.SearchResult:
     """
     Perform a Depth-First Search (DFS) on a given graph from start to end `Element`
     """
-    
+
     queue = priority.PriorityQueue[_DFSSearchTracker[models.Element]]()
     return bfs.queue_search(map, queue, lambda x: _DFSSearchTracker(x))

@@ -15,6 +15,7 @@ class SearchTracker(abc.ABC, Generic[models.Element]):
             3) [1, 4, 7]
             4) [1, 4, 7, 8]
     """
+
     @property
     @abc.abstractmethod
     def uid(self) -> str:
@@ -29,7 +30,7 @@ class SearchTracker(abc.ABC, Generic[models.Element]):
     @abc.abstractmethod
     def elements(self) -> List[models.Element]:
         """Return list of `Element`s"""
-    
+
     @abc.abstractmethod
     def __eq__(self, other: object) -> bool:
         """Check if `self` is equal to `other`"""
@@ -37,4 +38,3 @@ class SearchTracker(abc.ABC, Generic[models.Element]):
     @abc.abstractmethod
     def __hash__(self) -> int:
         """Element must be hashable"""
-

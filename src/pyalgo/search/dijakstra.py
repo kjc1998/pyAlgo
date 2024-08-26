@@ -5,7 +5,6 @@ from pyalgo.search import bfs
 from typing import List, Union
 
 
-
 class _DijakstraPathTracker(bfs._BFSSearchTracker[models.WeightedElement]):
     def __init__(self, elements: List[models.WeightedElement]):
         super().__init__(elements)
