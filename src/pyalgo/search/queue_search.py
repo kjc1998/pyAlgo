@@ -58,7 +58,7 @@ class SearchTracker(abc.ABC, Generic[models.Element]):
 
 def queue_search(
     map: models.ElementMap[models.Element],
-    queue: queue.Queue["SearchTracker[models.Element]"],
+    queue: queue.Queue[Any],
     convert: Callable[[List[models.Element]], "SearchTracker[models.Element]"],
 ) -> "SearchResult":
     """

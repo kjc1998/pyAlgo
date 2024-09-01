@@ -41,7 +41,7 @@ class FIFOQueue(queue.Queue[models.Element]):
 
         return result
 
-    def add(self, element: Any) -> None:
+    def add(self, element: models.Element) -> None:
         self._elements.append(element)
 
     def remove(self, uid: str) -> None:

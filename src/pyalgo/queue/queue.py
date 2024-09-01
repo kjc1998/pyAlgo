@@ -19,7 +19,7 @@ class Queue(abc.ABC, Generic[models.Element]):
         """Retrieve `Element` from queue"""
 
     @abc.abstractmethod
-    def add(self, element: Any) -> None:
+    def add(self, element: models.Element) -> None:
         """Add `Element` to queue"""
 
     @abc.abstractmethod

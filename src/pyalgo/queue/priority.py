@@ -60,7 +60,7 @@ class PriorityQueue(fifo.FIFOQueue[models.WeightedElement]):
         if elements is not None:
             self._elements = list(elements)
 
-    def add(self, element: Any) -> None:
+    def add(self, element: models.WeightedElement) -> None:
         """
         Queue elements based on their respective weights.
         Heavy weighted elements have higher priorities.

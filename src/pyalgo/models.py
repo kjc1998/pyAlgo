@@ -3,10 +3,8 @@ import decimal
 from typing import Generic, List, TypeVar, Union, Hashable
 from typing_extensions import Protocol
 
-Element = TypeVar("Element", bound="ElementProtocol", covariant=True)
-WeightedElement = TypeVar(
-    "WeightedElement", bound="WeightedElementProtocol", covariant=True
-)
+Element = TypeVar("Element", bound="ElementProtocol")
+WeightedElement = TypeVar("WeightedElement", bound="WeightedElementProtocol")
 ComparableElement = TypeVar(
     "ComparableElement",
     "ComparableElementProtocol",
