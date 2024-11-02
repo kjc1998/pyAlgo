@@ -16,20 +16,24 @@ class TestFIFOQueue:
         queue = queue_.FIFOQueue[MockElement]()
         return queue
 
-    def test_len(self, queue):
+    def test_len(self, queue: queue_.FIFOQueue[MockElement]):
         elements = [MockElement("1", "1"), MockElement("2", "2"), MockElement("3", "3")]
-        [queue.add(e) for e in elements]
+        for e in elements:
+            queue.add(e)
+
         assert len(queue) == 3
 
-    def test_round_trip(self, queue):
+    def test_round_trip(self, queue: queue_.FIFOQueue[MockElement]):
         element = MockElement("1234", "4321")
         queue.add(element)
         observed = queue.get()
         assert observed == element
 
-    def test_remove(self, queue):
+    def test_remove(self, queue: queue_.FIFOQueue[MockElement]):
         elements = [MockElement("1", "1"), MockElement("2", "2"), MockElement("3", "3")]
-        [queue.add(e) for e in elements]
+        for e in elements:
+            queue.add(e)
+
         queue.remove("2")
         assert queue.get() == MockElement("1", "1")
         assert queue.get() == MockElement("3", "3")

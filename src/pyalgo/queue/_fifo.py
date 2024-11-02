@@ -1,25 +1,6 @@
-"""
-Example:
-
-from pyalgo.queue.fifo import SampleData, FIFOQueue
-
-
-# NOTE: replace `SampleData` with any data structure of your choice, as long as it complies to `ElementProtocol` [defined in `pyalgo.models`]
-e1 = SampleData("1", 5)
-e2 = SampleData("1", 6)
-queue = PriorityQueue[SampleData]([e1, e2])
-"""
-
-import dataclasses
-from typing import Any, Iterable, List, Optional
+from typing import Iterable, List, Optional
 from pyalgo import models
 from pyalgo.queue import queue
-
-
-@dataclasses.dataclass
-class SampleData:
-    uid: str
-    value: Any
 
 
 class FIFOQueue(queue.Queue[models.Element]):
