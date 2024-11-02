@@ -1,5 +1,5 @@
 import pytest
-from pyalgo.sort import sort
+from pyalgo import sort
 
 
 @pytest.mark.parametrize(
