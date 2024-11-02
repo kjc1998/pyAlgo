@@ -1,5 +1,5 @@
 import abc
-from typing import Any, Generic
+from typing import Generic
 from pyalgo import models
 
 

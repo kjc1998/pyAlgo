@@ -1,6 +1,5 @@
 import decimal
-from pyalgo import models
-from pyalgo.queue import priority
+from pyalgo import models, queue as queue_
 from pyalgo.search import queue_search
 from typing import List, Optional, Union
 
@@ -86,5 +85,5 @@ def breadth_first_search(
         # in breadth-first-search, set the weight based on levels in reversed order
         return _BFSSearchTracker(elements)
 
-    queue = priority.PriorityQueue[_BFSSearchTracker[models.Element]]()
+    queue = queue_.PriorityQueue[_BFSSearchTracker[models.Element]]()
     return queue_search.queue_search(map, queue, _convert)

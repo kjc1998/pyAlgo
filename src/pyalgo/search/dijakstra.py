@@ -1,6 +1,5 @@
 import decimal
-from pyalgo import models
-from pyalgo.queue import priority
+from pyalgo import models, queue as queue_
 from pyalgo.search import queue_search, bfs
 from typing import List, Union
 
@@ -26,5 +25,5 @@ def dijakstra_search(
     Subset of breadth-first-search, with minor tweaks around weightage assignment
     """
 
-    queue = priority.PriorityQueue[_DijakstraPathTracker[models.WeightedElement]]()
+    queue = queue_.PriorityQueue[_DijakstraPathTracker[models.WeightedElement]]()
     return queue_search.queue_search(map, queue, lambda x: _DijakstraPathTracker(x))

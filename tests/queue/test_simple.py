@@ -1,6 +1,7 @@
 import dataclasses
 import pytest
-from pyalgo.queue import queue as queue_, fifo
+from pyalgo import queue as queue_
+from pyalgo.queue import queue as aqueue
 
 
 @dataclasses.dataclass(frozen=True)
@@ -12,7 +13,7 @@ class MockElement:
 class TestFIFOQueue:
     @pytest.fixture
     def queue(self):
-        queue = fifo.FIFOQueue[MockElement]()
+        queue = queue_.FIFOQueue[MockElement]()
         return queue
 
     def test_len(self, queue):
@@ -32,7 +33,7 @@ class TestFIFOQueue:
         queue.remove("2")
         assert queue.get() == MockElement("1", "1")
         assert queue.get() == MockElement("3", "3")
-        with pytest.raises(queue_.EmptyQueueError):
+        with pytest.raises(aqueue.EmptyQueueError):
             queue.get()
         with pytest.raises(KeyError):
             queue.remove("99")

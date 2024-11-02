@@ -1,6 +1,5 @@
 import decimal
-from pyalgo import models
-from pyalgo.queue import priority
+from pyalgo import models, queue as queue_
 from pyalgo.search import queue_search, bfs
 from typing import List, Union
 
@@ -26,5 +25,5 @@ def depth_first_search(
     Perform a Depth-First Search (DFS) on a given graph from start to end `Element`
     """
 
-    queue = priority.PriorityQueue[_DFSSearchTracker[models.Element]]()
+    queue = queue_.PriorityQueue[_DFSSearchTracker[models.Element]]()
     return queue_search.queue_search(map, queue, lambda x: _DFSSearchTracker(x))
