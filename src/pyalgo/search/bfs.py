@@ -4,10 +4,10 @@ from pyalgo.search import queue_search
 from typing import List, Optional, Union
 
 
-class _BFSSearchTracker(queue_search.SearchTracker[models.Element]):
+class _BFSPathTracker(queue_search.PathTracker[models.Element]):
     """
     Wrapper class to match signature of `PriorityQueue`, on top of additional properties for tracking `Element`s traversed
-    NOTE: Subclass of both `SearchTracker` and `WeightedElementProtocol`
+    NOTE: Subclass of both `PathTracker` and `WeightedElementProtocol`
     """
 
     def __init__(self, elements: List[models.Element]):
@@ -79,11 +79,11 @@ def breadth_first_search(
     Perform a Breadth-First Search (DFS) on a given graph from start to end `Element`
     """
 
-    def _convert(elements: List[models.Element]) -> _BFSSearchTracker[models.Element]:
+    def _convert(elements: List[models.Element]) -> _BFSPathTracker[models.Element]:
         # NOTE: Adjusting weight can achieve different search patterns
         # i.e. for depth-first-search, set the weight to match proportionally with number of elements, ensuring newer elements to be at front
         # in breadth-first-search, set the weight based on levels in reversed order
-        return _BFSSearchTracker(elements)
+        return _BFSPathTracker(elements)
 
-    queue = queue_.PriorityQueue[_BFSSearchTracker[models.Element]]()
+    queue = queue_.PriorityQueue[_BFSPathTracker[models.Element]]()
     return queue_search.queue_search(map, queue, _convert)

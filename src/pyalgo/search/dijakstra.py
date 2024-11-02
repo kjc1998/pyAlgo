@@ -4,7 +4,7 @@ from pyalgo.search import queue_search, bfs
 from typing import List, Union
 
 
-class _DijakstraPathTracker(bfs._BFSSearchTracker[models.WeightedElement]):
+class _DijakstraPathTracker(bfs._BFSPathTracker[models.WeightedElement]):
     def __init__(self, elements: List[models.WeightedElement]):
         super().__init__(elements)
         self.__elements = elements
