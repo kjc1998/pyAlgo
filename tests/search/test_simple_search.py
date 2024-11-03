@@ -1,8 +1,8 @@
 import pytest
 import dataclasses
 from typing import Dict, List
-from pyalgo import models
-from pyalgo.search import queue_search, dfs, bfs
+from pyalgo import models, search
+from pyalgo.search import queue_search
 
 
 @dataclasses.dataclass(frozen=True)
@@ -30,7 +30,9 @@ class SimpleMap(models.ElementMap["Element"]):
         return self._graph[uid]
 
 
-@pytest.mark.parametrize("search", [dfs.depth_first_search, bfs.breadth_first_search])
+@pytest.mark.parametrize(
+    "search", [search.depth_first_search, search.breadth_first_search]
+)
 @pytest.mark.parametrize(
     "graph, start, expected",
     [
@@ -123,7 +125,7 @@ def test_common_search(search, graph, start, expected):
     "search, expected",
     [
         pytest.param(
-            dfs.depth_first_search,
+            search.depth_first_search,
             queue_search.SearchResult(
                 [Element("1"), Element("2"), Element("5"), Element("end")],
                 {
@@ -141,7 +143,7 @@ def test_common_search(search, graph, start, expected):
             id="dfs_case",
         ),
         pytest.param(
-            bfs.breadth_first_search,
+            search.breadth_first_search,
             queue_search.SearchResult(
                 [Element("1"), Element("2"), Element("5"), Element("end")],
                 {

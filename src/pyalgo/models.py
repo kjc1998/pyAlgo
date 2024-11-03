@@ -30,22 +30,6 @@ class WeightedElementProtocol(ElementProtocol, Protocol):
     def weight(self) -> Union[int, float, decimal.Decimal]:
         """Return weight of self"""
 
-    @abc.abstractmethod
-    def __lt__(self, other: object) -> bool:
-        """Check if `self` is less than `other`"""
-
-    @abc.abstractmethod
-    def __le__(self, other: object) -> bool:
-        """Check if `self` is less than or equal to `other`"""
-
-    @abc.abstractmethod
-    def __gt__(self, other: object) -> bool:
-        """Check if `self` weighs more than `other`"""
-
-    @abc.abstractmethod
-    def __ge__(self, other: object) -> bool:
-        """Check if `self` weighs more than or equal to `other`"""
-
 
 class ElementMap(abc.ABC, Generic[Element]):
     """Map and form relationship patterns between `Element`s"""

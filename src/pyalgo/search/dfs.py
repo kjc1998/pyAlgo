@@ -1,29 +1,24 @@
 import decimal
-from pyalgo import models, queue as queue_
-from pyalgo.search import queue_search, bfs
-from typing import List, Union
+from typing import Union
+from pyalgo import models
+from pyalgo.search import path_queue, queue_search
 
-
-class _DFSPathTracker(bfs._BFSPathTracker[models.Element]):
-    def __init__(self, elements: List[models.Element]):
-        super().__init__(elements)
-        self.__elements = elements
-
-    @property
-    def weight(self) -> Union[int, float, decimal.Decimal]:
-        """
-        Weightage is dependent on number of elements stored.
-        The greater the number, the higher its priority.
-        """
-        return len(self.__elements)
+PathTracker = path_queue.PathTracker
+Numeric = Union[int, float, decimal.Decimal]
 
 
 def depth_first_search(
     map: models.ElementMap[models.Element],
-) -> queue_search.SearchResult:
+) -> queue_search.SearchResult[models.Element]:
     """
     Perform a Depth-First Search (DFS) on a given graph from start to end `Element`
     """
 
-    queue = queue_.PriorityQueue[_DFSPathTracker[models.Element]]()
-    return queue_search.queue_search(map, queue, lambda x: _DFSPathTracker(x))
+    def _convert(tracker: PathTracker[models.Element]) -> Numeric:
+        # NOTE: Adjusting weight can achieve different search patterns
+        # i.e. for depth-first-search, set the weight to match proportionally with number of elements, ensuring newer elements to be at front
+        # in breadth-first-search, set the weight based on levels in reversed order
+        return len(tracker.elements)
+
+    queue = path_queue.WeightPathQueue[models.Element](_convert)
+    return queue_search.queue_search(map, queue)

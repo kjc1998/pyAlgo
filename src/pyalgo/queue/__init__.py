@@ -1,4 +1,5 @@
-from pyalgo.queue import _priority, _fifo
+from pyalgo.queue._priority import PriorityQueue
+from pyalgo.queue._fifo import FIFOQueue
 
-PriorityQueue = _priority.PriorityQueue
-FIFOQueue = _fifo.FIFOQueue
+
+__all__ = ["PriorityQueue", "FIFOQueue"]

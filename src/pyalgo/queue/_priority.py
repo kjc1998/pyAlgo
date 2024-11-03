@@ -19,7 +19,7 @@ class PriorityQueue(_fifo.FIFOQueue[models.WeightedElement]):
         """
         inserted = False
         for i, e in enumerate(self._elements):
-            if element > e:
+            if element.weight > e.weight:
                 self._elements.insert(i, element)
                 inserted = True
                 break

@@ -1,8 +1,8 @@
 import pytest
 import dataclasses
 from typing import Dict, List, Union
-from pyalgo import models
-from pyalgo.search import queue_search, dijakstra
+from pyalgo import models, search
+from pyalgo.search import queue_search
 
 
 @dataclasses.dataclass(frozen=True)
@@ -56,7 +56,7 @@ class SimpleMap(models.ElementMap["Element"]):
         return self._graph[uid]
 
 
-@pytest.mark.parametrize("search", [dijakstra.dijakstra_search])
+@pytest.mark.parametrize("search", [search.dijakstra_search])
 @pytest.mark.parametrize(
     "graph, start, expected",
     [

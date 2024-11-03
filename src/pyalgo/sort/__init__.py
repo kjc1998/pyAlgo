@@ -1,4 +1,5 @@
-from pyalgo.sort import _quick_sort, _merge_sort
+from pyalgo.sort._quick_sort import quick_sort
+from pyalgo.sort._merge_sort import merge_sort
 
-merge_sort = _merge_sort.merge_sort
-quick_sort = _quick_sort.quick_sort
+
+__all__ = ["quick_sort", "merge_sort"]

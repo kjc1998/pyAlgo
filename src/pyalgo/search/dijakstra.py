@@ -1,29 +1,25 @@
 import decimal
-from pyalgo import models, queue as queue_
-from pyalgo.search import queue_search, bfs
-from typing import List, Union
+from typing import Union
+from pyalgo import models
+from pyalgo.search import path_queue, queue_search
 
-
-class _DijakstraPathTracker(bfs._BFSPathTracker[models.WeightedElement]):
-    def __init__(self, elements: List[models.WeightedElement]):
-        super().__init__(elements)
-        self.__elements = elements
-
-    @property
-    def weight(self) -> Union[int, float, decimal.Decimal]:
-        """
-        Weight grows with the total sum of elements' weights.
-        """
-        return sum([e.weight for e in self.__elements])
+PathTracker = path_queue.PathTracker
+Numeric = Union[int, float, decimal.Decimal]
 
 
 def dijakstra_search(
     map: models.ElementMap[models.WeightedElement],
-) -> queue_search.SearchResult:
+) -> queue_search.SearchResult[models.WeightedElement]:
     """
     https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm
     Subset of breadth-first-search, with minor tweaks around weightage assignment
     """
 
-    queue = queue_.PriorityQueue[_DijakstraPathTracker[models.WeightedElement]]()
-    return queue_search.queue_search(map, queue, lambda x: _DijakstraPathTracker(x))
+    def _convert(tracker: PathTracker[models.WeightedElement]) -> Numeric:
+        # NOTE: Adjusting weight can achieve different search patterns
+        # i.e. for depth-first-search, set the weight to match proportionally with number of elements, ensuring newer elements to be at front
+        # in breadth-first-search, set the weight based on levels in reversed order
+        return sum([e.weight for e in tracker.elements])
+
+    queue = path_queue.WeightPathQueue[models.WeightedElement](_convert)
+    return queue_search.queue_search(map, queue)
