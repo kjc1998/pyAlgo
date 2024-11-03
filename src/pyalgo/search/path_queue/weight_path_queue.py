@@ -29,7 +29,9 @@ class WeightPathQueue(path_queue.PathQueue[models.Element]):
         self,
         convert: Callable[[path_queue.PathTracker[models.Element]], Numeric],
     ) -> None:
-        self.__queue = queue.PriorityQueue["_WeightTracker[models.Element]"]()
+        self.__queue = queue.PriorityQueue["_WeightTracker[models.Element]"](
+            heavy=False
+        )
         self.__convert = convert
 
     def __len__(self) -> int:

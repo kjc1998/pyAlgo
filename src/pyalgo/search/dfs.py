@@ -18,7 +18,7 @@ def depth_first_search(
         # NOTE: Adjusting weight can achieve different search patterns
         # i.e. for depth-first-search, set the weight to match proportionally with number of elements, ensuring newer elements to be at front
         # in breadth-first-search, set the weight based on levels in reversed order
-        return len(tracker.elements)
+        return -1 * len(tracker.elements)
 
     queue = path_queue.WeightPathQueue[models.Element](_convert)
     return queue_search.queue_search(map, queue)
