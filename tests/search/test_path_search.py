@@ -12,7 +12,7 @@ class Element:
 
     def __eq__(self, other: object) -> bool:
         if isinstance(other, type(self)):
-            return self.weight == other.weight
+            return self.uid == other.uid and self.weight == other.weight
         return False
 
     def __lt__(self, other: object) -> bool:
@@ -65,7 +65,26 @@ class SimpleMap(models.ElementMap["Element"]):
             Element("end", 0),
             queue_search.SearchResult([Element("end", 0)], {0: [Element("end", 0)]}),
             id="start_eq_end_case",
-        )
+        ),
+        pytest.param(
+            {
+                "1": [Element("2", 2), Element("3", 7)],
+                "2": [Element("4", 3), Element("5", 4)],
+                "3": [Element("end", 0), Element("6", 2)],
+                "4": [],
+                "5": [],
+            },
+            Element("1", 0),
+            queue_search.SearchResult(
+                [Element("1", 0), Element("3", 7), Element("end", 0)],
+                {
+                    0: [Element("1", 0), Element("2", 2), Element("4", 3)],
+                    1: [Element("1", 0), Element("2", 2), Element("5", 4)],
+                    2: [Element("1", 0), Element("3", 7), Element("end", 0)],
+                },
+            ),
+            id="standard_case",
+        ),
     ],
 )
 def test_common_search(search, graph, start, expected):
