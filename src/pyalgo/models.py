@@ -3,6 +3,7 @@ import decimal
 from typing import Generic, List, TypeVar, Union
 from typing_extensions import Protocol
 
+Numbers = Union[int, float, decimal.Decimal]
 Element = TypeVar("Element", bound="ElementProtocol")
 WeightedElement = TypeVar("WeightedElement", bound="WeightedElementProtocol")
 
@@ -27,7 +28,7 @@ class WeightedElementProtocol(ElementProtocol, Protocol):
 
     @property
     @abc.abstractmethod
-    def weight(self) -> Union[int, float, decimal.Decimal]:
+    def weight(self) -> Numbers:
         """Return weight of self"""
 
 
