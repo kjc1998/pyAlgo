@@ -52,6 +52,14 @@ class LinkedNode(Generic[T]):
                 self.children.remove(child)
                 child.remove_parent()
 
+    def unlink(self) -> None:
+        parent = self.parent
+        children = [i for i in self.children]
+        self.remove_parent()
+        self.remove_children(*children)
+        if parent:
+            parent.add_children(*children)
+
     def __relationship_exists(
         self, parent: "LinkedNode[T]", child: "LinkedNode[T]"
     ) -> bool:

@@ -53,3 +53,28 @@ class TestLinkedNode:
         node.remove_children(one)
         assert one.parent == None
         assert node.children == [two]
+
+    def test_unlink(self, node: linked_node.LinkedNode[str]) -> None:
+        node = linked_node.LinkedNode("root")
+        one = linked_node.LinkedNode("1")
+        two = linked_node.LinkedNode("2")
+        node.add_children(one)
+        one.add_children(two)
+        assert node.parent == None
+        assert one.parent == node
+        assert two.parent == one
+        one.unlink()
+        assert node.children == [two]
+        assert two.parent == node
+        assert one.parent == None and one.children == []
+
+    def test_unlink_none(self, node: linked_node.LinkedNode[str]) -> None:
+        node = linked_node.LinkedNode("root")
+        one = linked_node.LinkedNode("1")
+        two = linked_node.LinkedNode("2")
+        node.add_children(one)
+        two.set_parent(one)
+        assert one.parent == node and two.parent == one
+        node.unlink()
+        assert node.parent == None and node.children == []
+        assert one.parent == None and one.children == [two]
