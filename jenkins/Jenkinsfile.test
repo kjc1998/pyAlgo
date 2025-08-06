@@ -30,9 +30,13 @@ pipeline {
                 }
             }
         }
-        stage('Build') {
+        stage('Install') {
             environment { HOME = '.' }
-            steps { sh 'make devinstall VERSION=0.0.0' }
+            steps { sh '''
+                python -m venv .venv
+                . .venv/bin/activate
+                make devinstall VERSION=0.0.0
+            ''' }
         }
         stage('Test') {
             steps { sh 'make test' }
