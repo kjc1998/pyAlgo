@@ -30,12 +30,17 @@ pipeline {
                 }
             }
         }
+        stage('Setup') {
+            steps {sh '''
+                python -m venv .venv
+                . .venv/bin/activate
+            '''}
+        }
         stage('Install') {
-            environment { HOME = '.' }
             steps { sh 'make devinstall VERSION=0.0.0' }
         }
         stage('Test') {
-            steps { sh 'pip list' }
+            steps { sh 'which pip' }
         }
     }
 }
