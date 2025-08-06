@@ -1,5 +1,6 @@
 import abc
-from typing import Any, Hashable, Protocol, TypeVar
+from typing import Any, Hashable, TypeVar
+from typing_extensions import Protocol
 
 
 Comparable = TypeVar("Comparable", bound="ComparableElementProtocol")

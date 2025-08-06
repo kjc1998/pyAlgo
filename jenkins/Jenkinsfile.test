@@ -3,6 +3,7 @@ pipeline {
         docker {
             label 'docker'
             image 'docker.io/python:3.7'
+            args '--user root'
         }
     }
 
@@ -32,10 +33,7 @@ pipeline {
         }
         stage('Install') {
             environment { HOME = '.' }
-            steps { sh '''
-                make devinstall VERSION=0.0.0
-                export PATH="$HOME/.local/bin:$PATH"
-            ''' }
+            steps { sh 'make devinstall VERSION=0.0.0' }
         }
         stage('Test') {
             steps { sh 'make test' }
