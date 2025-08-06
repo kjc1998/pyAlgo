@@ -20,17 +20,17 @@ versionfile: $(VERSION_FILE)
 
 #' package: build package
 package: versionfile
-	$(PIP) install --upgrade build
+	$(PIP) install --user --upgrade build
 	$(PYTHON) -m build
 
 #' install: install package
 install: package
-	$(PIP) install $(PACKAGE_FILE)
+	$(PIP) install --user $(PACKAGE_FILE)
 
 #' devinstall: install package in development mode
 devinstall: versionfile
-	$(PIP) install -e .
-	$(PIP) install -r requirements-dev.txt
+	$(PIP) install -e --user .
+	$(PIP) install -r --user requirements-dev.txt
 
 #' tests: alias for test
 tests: test
