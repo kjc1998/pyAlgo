@@ -31,16 +31,13 @@ pipeline {
             }
         }
         stage('Setup') {
-            steps {sh '''
-                python -m venv .venv
-                . .venv/bin/activate
-            '''}
+            steps { sh "export PATH=$HOME/.local/bin:$PATH" }
         }
         stage('Install') {
             steps { sh 'make devinstall VERSION=0.0.0' }
         }
         stage('Test') {
-            steps { sh 'which pip' }
+            steps { sh 'make tests' }
         }
     }
 }
