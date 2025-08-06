@@ -16,6 +16,8 @@ pipeline {
         )
     }
 
+    environment { HOME='.' }
+
     stages {
         stage('Validate') {
             steps {
@@ -30,8 +32,10 @@ pipeline {
                 }
             }
         }
+        stage('Setup') {
+            steps { sh "export PATH:$HOME/.local/bin:$PATH" }
+        }
         stage('Install') {
-            environment { HOME='.' }
             steps { sh 'make devinstall VERSION=0.0.0' }
         }
         stage('Test') {
