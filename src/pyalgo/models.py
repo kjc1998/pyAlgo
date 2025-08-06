@@ -1,11 +1,29 @@
 import abc
 import decimal
-from typing import Generic, List, TypeVar, Union
+from typing import Any, Generic, List, TypeVar, Union
 from typing_extensions import Protocol
 
 Numbers = Union[int, float, decimal.Decimal]
+Comparable = TypeVar("Comparable", bound="ComparableProtocol")
 Element = TypeVar("Element", bound="ElementProtocol")
 WeightedElement = TypeVar("WeightedElement", bound="WeightedElementProtocol")
+
+
+class ComparableProtocol(Protocol):
+    def __gt__(self, other: Any) -> bool:
+        """Return if `self` is greater than `other`"""
+
+    def __ge__(self, other: Any) -> bool:
+        """Return if `self` is greater than or equal to `other`"""
+
+    def __eq__(self, other: Any) -> bool:
+        """Return if `self` is equal to `other`"""
+
+    def __lt__(self, other: Any) -> bool:
+        """Return if `self` is less than `other`"""
+
+    def __le__(self, other: Any) -> bool:
+        """Return if `self` is less than or equal to `other`"""
 
 
 class ElementProtocol(Protocol):
