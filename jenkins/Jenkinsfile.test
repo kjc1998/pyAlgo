@@ -32,7 +32,7 @@ pipeline {
         }
         stage('Build') {
             environment { HOME = '.' }
-            steps { sh 'make devinstall' }
+            steps { sh 'make versionfile devinstall' }
         }
         stage('Test') {
             steps { sh 'make test' }
