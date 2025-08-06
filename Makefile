@@ -29,7 +29,7 @@ install: package
 
 #' devinstall: install package in development mode
 devinstall: versionfile
-	$(PIP) install -e --user .
+	$(PIP) install -e .
 	$(PIP) install -r --user requirements-dev.txt
 
 #' tests: alias for test
