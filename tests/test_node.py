@@ -1,4 +1,4 @@
-from pyalgo.tree import node
+from pyalgo import node
 
 
 class TestNode:
