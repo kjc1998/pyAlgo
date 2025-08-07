@@ -3,6 +3,10 @@ pipeline {
         docker {
             label 'docker'
             image 'docker.io/python:3.7'
+            args '''
+                --volume /etc/passwd:/etc/passwd:ro
+                --volume /etc/group:/etc/group:ro
+            '''
         }
     }
 
