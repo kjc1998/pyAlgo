@@ -3,10 +3,7 @@ pipeline {
         docker {
             label 'docker'
             image 'docker.io/python:3.7'
-            args '''
-                --volume /etc/passwd:/etc/passwd:ro
-                --volume /etc/group:/etc/group:ro
-            '''
+            args '--user root'
         }
     }
 
@@ -19,8 +16,6 @@ pipeline {
             numToKeepStr: '10'
         )
     }
-
-    environment { HOME = '.' }
 
     stages {
         stage('Validate') {
@@ -40,12 +35,7 @@ pipeline {
             steps { sh 'make devinstall VERSION=0.0.0' }
         }
         stage('Test') {
-            steps {
-                sh '''
-                    export PATH=$HOME/.local/bin:$PATH
-                    make tests
-                '''
-            }
+            steps { sh 'make tests' }
         }
     }
 }
