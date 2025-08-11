@@ -2,52 +2,7 @@ from pyalgo import node
 from pyalgo.tree import tree
 from pyalgo.models import Comparable as C
 from pyalgo.tree.tree import Node, NodeMap
-from typing import Generic, List, Optional, Sequence, Tuple
-
-
-class _BinaryTreeHandler(Generic[C]):
-    @staticmethod
-    def left_right(base: Node[C]) -> Tuple[Optional[Node[C]], Optional[Node[C]]]:
-        children = sorted(base.children, key=lambda x: x.item)
-        if len(children) == 2:
-            return (children[0], children[1])
-        if len(children) == 1:
-            child = children[0]
-            return (child, None) if child.item < base.item else (None, child)
-        return (None, None)
-
-    @staticmethod
-    def get(base: Node[C], item: C) -> Node[C]:
-        if base.item == item:
-            return base
-
-        left, right = _BinaryTreeHandler.left_right(base)
-        if left and item < base.item:
-            return _BinaryTreeHandler.get(left, item)
-        elif right and item >= base.item:
-            return _BinaryTreeHandler.get(right, item)
-        else:
-            raise ValueError(f"No such item in tree: {item}")
-
-    @staticmethod
-    def add(base: Node[C], node: Node[C]) -> None:
-        left, right = _BinaryTreeHandler.left_right(base)
-        if left and node.item < base.item:
-            _BinaryTreeHandler.add(left, node)
-        elif right and node.item >= base.item:
-            _BinaryTreeHandler.add(right, node)
-        else:
-            base.add_children(node)
-
-    @staticmethod
-    def unlink(base: Node[C]) -> Tuple[Optional[Node[C]], Sequence[Node[C]]]:
-        parent = base.parents[0] if base.parents else None
-        children = tuple(
-            c for c in _BinaryTreeHandler.left_right(base) if c is not None
-        )
-        base.remove_parents(*base.parents)
-        base.remove_children(*base.children)
-        return parent, children
+from typing import List, Optional, Sequence, Tuple
 
 
 class BinaryTree(tree.Tree[C]):
@@ -63,7 +18,7 @@ class BinaryTree(tree.Tree[C]):
     @property
     def height(self) -> int:
         def get_height(node: Node[C]) -> int:
-            left, right = _BinaryTreeHandler.left_right(node)
+            left, right = self.__left_right(node)
             left_height = get_height(left) if left else 0
             right_height = get_height(right) if right else 0
             return 1 + max(left_height, right_height)
@@ -73,7 +28,7 @@ class BinaryTree(tree.Tree[C]):
     @property
     def mappings(self) -> List[NodeMap[C]]:
         def get_mappings(node: Node[C]) -> List[NodeMap[C]]:
-            left, right = _BinaryTreeHandler.left_right(node)
+            left, right = self.__left_right(node)
             result: List[NodeMap[C]] = [
                 (node.item, [i.item for i in [left, right] if i is not None]),
             ]
@@ -88,21 +43,19 @@ class BinaryTree(tree.Tree[C]):
         if self.root is None:
             self.__root = item_node
             return None
-        _BinaryTreeHandler.add(self.root, item_node)
+        self.__binary_add(self.root, item_node)
 
     def remove(self, item: C) -> None:
         if not self.root:
             raise ValueError(f"No such item in tree: {item}")
 
-        node = _BinaryTreeHandler.get(self.root, item)
-        parent, children = _BinaryTreeHandler.unlink(node)
-        if self.root == node:
-            self.__assign_root(children)
-        elif parent:
+        node = self.__binary_get(self.root, item)
+        parent, children = self.__unlink(node)
+        if parent:
             for child in children:
-                _BinaryTreeHandler.add(parent, child)
+                self.__binary_add(parent, child)
         else:
-            raise ValueError
+            self.__assign_root(children)
 
     def __assign_root(self, children: Sequence[Node[C]]) -> None:
         self.__root = None
@@ -110,4 +63,41 @@ class BinaryTree(tree.Tree[C]):
             if self.root is None:
                 self.__root = child
             else:
-                _BinaryTreeHandler.add(self.root, child)
+                self.__binary_add(self.root, child)
+
+    def __binary_get(self, base: Optional[Node[C]], item: C) -> Node[C]:
+        if base is None:
+            raise ValueError(f"No such item in tree: {item}")
+        if base.item == item:
+            return base
+
+        left, right = self.__left_right(base)
+        if item < base.item:
+            return self.__binary_get(left, item)
+        return self.__binary_get(right, item)
+
+    def __binary_add(self, base: Node[C], node: Node[C]) -> None:
+        left, right = self.__left_right(base)
+        if left and node.item < base.item:
+            self.__binary_add(left, node)
+        elif right and node.item >= base.item:
+            self.__binary_add(right, node)
+        else:
+            base.add_children(node)
+
+    def __unlink(self, base: Node[C]) -> Tuple[Optional[Node[C]], Sequence[Node[C]]]:
+        parent = base.parents[0] if base.parents else None
+        children = tuple(c for c in self.__left_right(base) if c is not None)
+        base.remove_parents(*base.parents)
+        base.remove_children(*base.children)
+        return parent, children
+
+    @staticmethod
+    def __left_right(base: Node[C]) -> Tuple[Optional[Node[C]], Optional[Node[C]]]:
+        children = sorted(base.children, key=lambda x: x.item)
+        if len(children) == 2:
+            return (children[0], children[1])
+        if len(children) == 1:
+            child = children[0]
+            return (child, None) if child.item < base.item else (None, child)
+        return (None, None)
