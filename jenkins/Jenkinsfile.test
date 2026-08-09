@@ -2,7 +2,7 @@ pipeline {
     agent {
         kubernetes {
             defaultContainer 'python'
-            yamlFile 'python_pod.yaml'
+            yamlFile 'jenkins/python_pod.yaml'
         }
     }
 
