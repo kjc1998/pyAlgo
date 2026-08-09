@@ -1,9 +1,20 @@
 pipeline {
     agent {
-        docker {
-            label 'docker'
-            image 'docker.io/python:3.7'
-            args '--user root'
+        agent {
+            kubernetes {
+                yaml '''
+                    apiVersion: v1
+                    kind: Pod
+                    spec:
+                        containers:
+                        -   name: python
+                            image: python:3.7
+                            command:
+                            - sleep
+                            args:
+                            - infinity
+                '''
+            }
         }
     }
 
