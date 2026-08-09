@@ -17,9 +17,7 @@ pipeline {
     }
 
     options {
-        options {
-            container('python')
-        }
+        container('python')
         // only keeps last 10 builds
         buildDiscarder logRotator(
             artifactDaysToKeepStr: '',
