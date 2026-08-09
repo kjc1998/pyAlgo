@@ -1,6 +1,8 @@
 pipeline {
     agent {
         kubernetes {
+            webSocket true
+            defaultContainer 'python'
             yaml '''
                 apiVersion: v1
                 kind: Pod
