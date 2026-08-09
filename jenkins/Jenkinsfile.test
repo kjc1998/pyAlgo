@@ -1,8 +1,6 @@
 pipeline {
     agent {
         kubernetes {
-            webSocket true
-            defaultContainer 'python'
             yaml '''
                 apiVersion: v1
                 kind: Pod
@@ -19,6 +17,9 @@ pipeline {
     }
 
     options {
+        options {
+            container('python')
+        }
         // only keeps last 10 builds
         buildDiscarder logRotator(
             artifactDaysToKeepStr: '',
